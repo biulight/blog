@@ -1,0 +1,45 @@
+name: Deployment
+# 触发脚本的条件，develop分支push代码的时候
+on:
+  push:
+    branches:
+      - release
+# 要执行的任务
+jobs:
+  # 任务名称
+  build:
+    # runs-on 指定job任务运行所需要的虚拟机环境（必填）
+    # runs-on: self-hosted
+    runs-on: ubuntu-latest
+    # 任务步骤
+    steps:
+      # 获取源码
+      - name: pull code
+        # 使用action库  actions/checkout获取源码
+        uses: actions/checkout@v3
+      # 安装node
+      - name: create build environments
+        # 使用action库 actions/setup-node 安装node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.16.0
+      # 安装依赖
+      - name: install
+        run: npm install
+      # 打包
+      - name: build
+        run: npm run build
+      # 上传打包文件到远程服务器
+      - name: ssh deploy
+        uses: easingthemes/ssh-deploy@v2.2.11
+        env:
+          REMOTE_USER: ${{secrets.ALY_USER}}
+          REMOTE_HOST: ${{secrets.ALY_HOST}}
+          REMOTE_PORT: "22"
+          ARGS: "-rltgoDzvO --delete"
+          SSH_PRIVATE_KEY: ${{secrets.ALY_SSH_TOKEN}}
+          # SSH_PRIVATE_KEY: ${{secrets.VITETEST}}
+          # 要上传文件所在目录
+          SOURCE: "dist/*"
+          # 远程服务器目标路径
+          TARGET: "/root/www/blog"
