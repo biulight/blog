@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+id: 2
 ---
 
 # bootstrap-valiator 校验

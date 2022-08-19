@@ -34,6 +34,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          routeBasePath: '/',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // editUrl:
@@ -60,14 +61,20 @@ const config = {
         title: 'biulight Site',
         logo: {
           alt: 'biulight Site Logo',
-          src: 'img/logo.png',
+          src: 'img/logo1.png',
         },
         items: [
           {
-            type: 'doc',
-            docId: 'intro',
+            type: 'docSidebar',
+            sidebarId: 'frontend',
             position: 'left',
             label: 'Frontend',
+          },
+          {
+            type: 'docSidebar',
+            sidebarId: 'learning',
+            position: 'left',
+            label: 'Learning',
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           // {

@@ -1,3 +1,13 @@
+---
+title: 小程序与h5通信实现方案
+authors: biulight
+tags: [Weixin Mini Program]
+---
+
+微信小程序原生页面与webview内嵌的h5页面通信方案的实现
+
+<!--truncate-->
+
 # 小程序内嵌h5与native通信实现
 
 微信小程序webview内嵌h5与小程序通信实现

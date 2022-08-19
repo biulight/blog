@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+id: 1
 ---
 
 # ES5和ES6变量声明的差异
