@@ -34,7 +34,7 @@ tags: [Weixin Mini Program]
 
 ### 实现的条件
 
-:::tips
+:::tip
 
 url链接 `hash` 变化，不会重新加载页面
 
