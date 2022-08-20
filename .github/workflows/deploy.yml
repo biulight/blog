@@ -40,6 +40,6 @@ jobs:
           SSH_PRIVATE_KEY: ${{secrets.ALY_SSH_TOKEN}}
           # SSH_PRIVATE_KEY: ${{secrets.VITETEST}}
           # 要上传文件所在目录
-          SOURCE: "dist/*"
+          SOURCE: "build/*"
           # 远程服务器目标路径
           TARGET: "/root/www/blog"

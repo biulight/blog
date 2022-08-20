@@ -1,0 +1,6 @@
+label: 键盘侠
+position: 1
+link:
+  type: doc
+  # id: learning/keyboard
+  id: learning/keyboardHero/intro
