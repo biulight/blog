@@ -81,12 +81,13 @@ git clone git@github.com:biulight/blog.git
 ```
 **但是**，由于现在使用的biulight的秘钥，因此需要修改原有的URL
 ```bash
+# 用上面配置的HostName替换链接中的 `github.com`
 git clone git@biulight:biulight/blog.git
 ```
 
 ### 总结
 
-完成上述步骤，就可以通过git ssh玩转多个github账户了
+此时，就可以通过git ssh玩转多个github账户了
 
 ## 其他
 
