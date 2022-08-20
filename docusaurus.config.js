@@ -82,7 +82,7 @@ const config = {
           //   position: 'right',
           // },
           {
-            href: 'https://github.com/jiangdingfei/blog',
+            href: 'https://github.com/biulight/blog',
             label: 'GitHub',
             position: 'right',
           },
@@ -126,7 +126,7 @@ const config = {
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/jiangdingfei/blog',
+                href: 'https://github.com/biulight/blog',
               },
             ],
           },
