@@ -7,7 +7,7 @@ tags: [git, ssh, github]
 在同一台电脑上，如何配置多个SSH Key？
 <!--truncate-->
 
-# 同一个电脑用户ssh同时使用多个github账户
+<!-- # 同一个电脑用户ssh同时使用多个github账户 -->
 
 ## 背景
 
@@ -54,7 +54,7 @@ ssh-keygen -m PEM -t rsa -b 4096 -f biulight -C "biulight007@gmail.com"
 
 3. 再次打开终端，编辑 `~/.ssh/config` 文件
 
-在该文件中新增一下内容
+在该文件中新增以下内容
 ```bash
 # biulight登录信息
 Host biulight # 别名（可以随便起）
