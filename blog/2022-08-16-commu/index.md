@@ -4,13 +4,12 @@ authors: biulight
 tags: [Weixin Mini Program]
 ---
 
-微信小程序原生页面与webview内嵌的h5页面通信方案的实现
+在微信小程序中，如何实现原生页面与webview内嵌的h5页面双向通信？
 
 <!--truncate-->
 
-# 小程序内嵌h5与native通信实现
+<!-- # 小程序内嵌h5与native通信实现 -->
 
-微信小程序webview内嵌h5与小程序通信实现
 
 ## 背景
 
