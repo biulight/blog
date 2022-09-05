@@ -131,7 +131,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Biulight Project, Inc. Built with Docusaurus.<br /><a href="//beian.miit.gov.cn">苏ICP备2020068292号-3</a>`,
       },
       prism: {
         theme: lightCodeTheme,
