@@ -128,7 +128,7 @@ jobs:
           path: build
 
       - name: SSH deploy to server
-        uses: easingthemes/ssh-deploy@v5.1.1
+        uses: easingthemes/ssh-deploy@v5.1.2
         env:
           REMOTE_USER: ${{ matrix.server.user }}
           REMOTE_HOST: ${{ matrix.server.host }}
