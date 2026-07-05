@@ -18,6 +18,25 @@
 
 .buttons {
   display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+}
+
+.main {
+  padding: 3rem 0;
+}
+
+.card {
+  height: 100%;
+  padding: 1.75rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: var(--ifm-card-border-radius);
+  background: var(--ifm-card-background-color);
+  box-shadow: var(--ifm-global-shadow-lw);
+}
+
+.card h2 {
+  margin-top: 0;
 }
