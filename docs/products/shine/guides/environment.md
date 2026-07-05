@@ -7,8 +7,8 @@ sidebar_position: 5
 
 Shine 可以保存预设模板变量，也可以使用 GPG 封存项目环境中的敏感值。不要把真实密钥写进公开仓库或文档示例。
 
-`shine env seal`、workspace 形式的 `shine env run` 及 `env run --with` 已合入 Shine，但尚未
-包含在当前发布版 0.35.0 中；需要使用后续版本或源码构建。
+`shine env seal`、workspace 形式的 `shine env run` 及 `env run --with` 均已包含在
+Shine 0.36.0 中。
 
 ## 查看和设置变量
 
@@ -18,6 +18,10 @@ shine env get HTTP_PROXY_PORT
 shine env set HTTP_PROXY_PORT 6152
 shine env delete HTTP_PROXY_PORT
 ```
+
+`PROXY_NO_PROXY` 控制 `setproxy` 设置的 `NO_PROXY` 和 `no_proxy`，默认为
+`localhost,127.0.0.1,::1`。修改它或其他代理变量后，`shine update` 会把已安装的
+`proxy` shell 预设标记为可更新；运行 `shine upgrade` 应用新值。
 
 `shine env show` 默认隐藏敏感值；`--reveal` 会显示完整值，应只在安全终端中使用。变量通常保存到当前配置的 `[env]` 表。
 

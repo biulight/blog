@@ -23,7 +23,7 @@ shine --version
 
 ```bash
 SHINE_INSTALL_DIR=/custom/bin sh install.sh
-SHINE_VERSION=0.35.0 sh install.sh
+SHINE_VERSION=0.36.0 sh install.sh
 ```
 
 ## Windows PowerShell
@@ -36,7 +36,7 @@ irm https://github.com/biulight/shine/releases/latest/download/install.ps1 | iex
 
 ```powershell
 $env:SHINE_INSTALL_DIR = "$env:USERPROFILE\bin"; .\install.ps1
-$env:SHINE_VERSION = "0.35.0"; .\install.ps1
+$env:SHINE_VERSION = "0.36.0"; .\install.ps1
 ```
 
 ## 从源码安装

@@ -58,6 +58,19 @@ shine upgrade --verbose
 
 如果使用项目 `shine.config.toml`、项目 `shine.env.toml` 或 overlay，请确认当前工作目录和覆盖优先级。
 
+## `shine pull` 拒绝更新来源
+
+`shine pull` 只对干净、已设置 upstream 的普通分支执行快进更新。先进入错误信息显示的仓库并检查：
+
+```bash
+git status
+git branch --show-current
+git branch -vv
+git pull --ff-only
+```
+
+请自行提交、stash 或处理本地改动和分支分歧，再重新运行 `shine pull`。Shine 不会自动丢弃改动或解决冲突。若提示找不到 Git，请先安装 Git 并确认 `git` 在 `PATH` 中；非 Git 预设目录被跳过属于正常行为。
+
 ## 系统初始化前想确认影响
 
 ```bash
@@ -75,4 +88,3 @@ shine sys uninstall <ITEM> --dry-run
 ```bash
 shine update --refresh
 ```
-

@@ -5,8 +5,8 @@ sidebar_position: 1
 
 # 命令参考
 
-本页已审阅至 Shine 提交 `395c860`；当前发布版本仍为 0.35.0，因此部分标为未发布的能力
-需要使用后续版本或源码构建。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
+本页已审阅至 Shine 0.36.0（提交 `a4129cc`）。任何子命令都可以使用 `--help`
+查看当前安装版本的准确参数。
 
 ## 顶层命令
 
@@ -18,6 +18,7 @@ sidebar_position: 1
 | `shine uninstall <CATEGORY>` | 自动匹配并卸载一个类别 |
 | `shine list` | 列出当前已安装且可用的预设与配置 |
 | `shine info <TARGET>` | 查看已安装目标的状态和差异 |
+| `shine pull` | 快进拉取由 Git 管理的预设与 overlay 来源 |
 | `shine update` | 检查受管内容和 Shine 稳定版更新 |
 | `shine upgrade` | 更新已安装的 shell 与 app 配置 |
 | `shine clear` | 清理架构变更后遗留的旧运行时状态 |
@@ -50,14 +51,17 @@ shine app uninstall [CATEGORY] [--force] [--purge] [--dry-run]
 
 ```text
 shine info <TARGET> [--diff] [--verbose]
-shine update [--verbose] [--refresh]
-shine upgrade [--verbose] [--prune-stale]
+shine pull
+shine update [--pull] [--verbose] [--refresh]
+shine upgrade [--pull] [--verbose] [--prune-stale]
 shine clear [--dry-run]
 shine completions install
 shine completions <bash|zsh|powershell>
 ```
 
 - `--refresh` 跳过 24 小时版本检查缓存。
+- `update --pull` 先拉取 Git 来源并重新加载配置，再检查状态。
+- `upgrade --pull` 先拉取 Git 来源并重新加载配置，再更新已安装配置。
 - `--prune-stale` 移除预设来源中已不存在的旧受管 app 文件。
 - `info --diff` 显式输出预期内容差异，`--verbose` 还会输出内容。
 
@@ -86,7 +90,7 @@ shine env seal [FILE] [--workspace <FILE>] [-r <RECIPIENT>]
 shine env run [--workspace <FILE>] [--mode <MODE>] [--with <KEY[=ALIAS]>]... -- <COMMAND>...
 ```
 
-`--with` 是 0.35.0 之后尚未发布的能力，可以重复使用。它把 Shine 配置中的 `KEY` 仅提供给本次启动的子进程；写成
+`--with` 可以重复使用。它把 Shine 配置中的 `KEY` 仅提供给本次启动的子进程；写成
 `KEY=ALIAS` 可改变子进程看到的变量名。只使用 `--with` 时不要求存在
 `shine.workspace.toml`。
 
@@ -96,6 +100,7 @@ shine env run [--workspace <FILE>] [--mode <MODE>] [--with <KEY[=ALIAS]>]... -- 
 shine overlay link <PATH> [--create]
 shine overlay show
 shine overlay unlink
+shine pull
 shine self install [--dest <PATH>]
 shine self upgrade [--channel <stable|preview>]
 ```
