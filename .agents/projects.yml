@@ -1,0 +1,41 @@
+# Human-readable registry used by documentation maintainers and AI agents.
+projects:
+  - id: shine
+    name: Shine
+    status: active
+    local_path: ../shine
+    repository: https://github.com/biulight/shine
+    manual_root: docs/products/shine
+    fact_sources:
+      - docs/README.zh-CN.md
+      - CHANGELOG.md
+      - cli/src/commands
+      - Cargo.toml
+    last_reviewed_ref: 173b61848a7ddcafb09a50ee420a4a3d5489467d
+    last_reviewed_version: 0.35.0
+
+  - id: deskmesh
+    name: Deskmesh
+    status: planned
+    local_path: ../deskmesh
+    repository: https://github.com/biulight007/deskmesh
+    manual_root: docs/products/deskmesh
+    fact_sources:
+      - README.md
+      - CHANGELOG.md
+      - src-tauri/src
+    last_reviewed_ref: null
+    last_reviewed_version: null
+
+  - id: lumeport
+    name: Lumeport
+    status: planned
+    local_path: ../lumeport
+    repository: https://github.com/biulight007/lumeport
+    manual_root: docs/products/lumeport
+    fact_sources:
+      - README.md
+      - CHANGELOG.md
+      - src-tauri/src
+    last_reviewed_ref: null
+    last_reviewed_version: null

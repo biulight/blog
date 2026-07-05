@@ -2,6 +2,7 @@
   "name": "@biulight/blog",
   "version": "1.2.1",
   "private": true,
+  "packageManager": "pnpm@11.7.0",
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
@@ -27,6 +28,9 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.9.2",
     "@docusaurus/tsconfig": "3.9.2",
+    "@docusaurus/types": "3.9.2",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.3",
     "typescript": "5.9.2"
   },
   "browserslist": {
@@ -42,6 +46,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.00"
+    "node": ">=18.0.0"
   }
 }

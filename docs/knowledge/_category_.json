@@ -1,0 +1,8 @@
+{
+  "label": "知识库",
+  "position": 2,
+  "link": {
+    "type": "doc",
+    "id": "knowledge/index"
+  }
+}
