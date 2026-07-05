@@ -1,6 +1,6 @@
 {
   "name": "@biulight/blog",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "private": true,
   "packageManager": "pnpm@11.7.0",
   "scripts": {
