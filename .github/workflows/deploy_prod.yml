@@ -26,6 +26,8 @@ jobs:
   # 预检步骤：在任何构建/部署前检测必须的 secrets/vars 是否存在，早失败并提示缺失项
   preflight:
     runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
     environment:
       name: prod
     steps:
@@ -65,6 +67,31 @@ jobs:
 
           echo "✅ Version check passed: $LATEST_VERSION -> $CURRENT_VERSION"
 
+      - name: Check required secrets and variables
+        id: check
+        run: |
+          missing=""
+          # Check SSH secret for server deploy
+          if [ -z "${{ secrets.ALY_SSH_TOKEN }}" ]; then
+            missing="${missing} secrets.ALY_SSH_TOKEN"
+          fi
+
+          # Check DEPLOY_SERVERS variable
+          if [ -z "${{ vars.DEPLOY_SERVERS }}" ]; then
+            missing="${missing} vars.DEPLOY_SERVERS"
+          fi
+
+          # If Pages deployment will run (only for workflow_dispatch + prod), we don't require extra secrets here.
+          # Emit helpful guidance and fail early if any required items missing.
+          if [ -n "$missing" ]; then
+            echo "Missing required configuration:$missing"
+            echo "::error::Missing required configuration:$missing"
+            exit 1
+          fi
+
+          echo "All required secrets/vars present."
+          echo "ready=true" >> $GITHUB_OUTPUT
+
   build:
     needs: preflight
     runs-on: ubuntu-latest
@@ -98,12 +125,27 @@ jobs:
         with:
           path: build/
 
-      - name: Upload build artifact (for GitHub Release)
+      - name: Upload build artifact (for SSH deploy)
         uses: actions/upload-artifact@v5
         with:
           retention-days: 2
           name: build-dist
           path: build/
+
+  prepare-deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: prod
+    outputs:
+      servers: ${{ steps.set-matrix.outputs.servers }}
+    steps:
+      - name: Set deploy servers matrix
+        id: set-matrix
+        env:
+          SERVERS: ${{ vars.DEPLOY_SERVERS }}
+        run: |
+          echo "servers=$SERVERS" >> $GITHUB_OUTPUT
 
   deploy-pages:
     needs: build
@@ -116,9 +158,55 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+  deploy:
+    needs: prepare-deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: prod
+    permissions: # Scope permissions as narrowly as possible
+      contents: read
+      id-token: write
+      actions: read
+    strategy:
+      fail-fast: true
+      max-parallel: 2
+      matrix:
+        server: ${{ fromJson(needs.prepare-deploy.outputs.servers) }}
+    steps:
+      - name: Verify runner security and dependencies
+        run: |
+          echo "Verifying runner security and dependencies..."
+          # Check for required tools
+          which ssh || (echo "ssh not found" && exit 1)
+          which rsync || (echo "rsync not found" && exit 1)
+          # Optionally check for OS updates
+          # sudo apt-get update -y
+          # sudo apt-get upgrade -y
+          echo "Runner verification complete."
+      - name: Download build artifact for SSH deploy
+        uses: actions/download-artifact@v6
+        with:
+          name: build-dist
+          path: build
+
+      - name: SSH deploy to server
+        uses: easingthemes/ssh-deploy@v5.1.1
+        env:
+          REMOTE_USER: ${{ matrix.server.user }}
+          REMOTE_HOST: ${{ matrix.server.host }}
+          REMOTE_PORT: "22"
+          ARGS: "-rltgoDzvO --delete"
+          SSH_PRIVATE_KEY: ${{ secrets.ALY_SSH_TOKEN }}
+          SOURCE: "build/*"
+          TARGET: "/var/www/timeline"
+        with:
+          REMOTE_HOST: ''
+          REMOTE_USER: ''
+          SSH_PRIVATE_KEY: ''
+
   tag-and-release:
-    needs: deploy-pages
-    if: ${{ !cancelled() && needs.deploy-pages.result == 'success' }}
+    needs: [deploy, deploy-pages]
+    if: ${{ !cancelled() && needs.deploy.result == 'success' }}
     runs-on: ubuntu-latest
     env:
       NODE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.node_version || '22.18.0' }}
