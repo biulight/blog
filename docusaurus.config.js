@@ -188,6 +188,7 @@ const config = {
       prism: {
         theme: lightTheme,
         darkTheme: darkTheme,
+        additionalLanguages: ['dns-zone-file'],
       },
       algolia: {
         // Algolia 提供的应用 ID
