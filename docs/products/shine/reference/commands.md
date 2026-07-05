@@ -5,7 +5,8 @@ sidebar_position: 1
 
 # 命令参考
 
-以下命令适用于 Shine 0.35.0。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
+本页已审阅至 Shine 提交 `395c860`；当前发布版本仍为 0.35.0，因此部分标为未发布的能力
+需要使用后续版本或源码构建。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
 
 ## 顶层命令
 
@@ -82,8 +83,12 @@ shine env encrypt [-r <RECIPIENT>] [--from <KEY>] [--set <KEY>]
 shine env decrypt <KEY>
 shine env export <KEY> [--as <ALIAS>]
 shine env seal [FILE] [--workspace <FILE>] [-r <RECIPIENT>]
-shine env run [--workspace <FILE>] [--mode <MODE>] -- <COMMAND>...
+shine env run [--workspace <FILE>] [--mode <MODE>] [--with <KEY[=ALIAS]>]... -- <COMMAND>...
 ```
+
+`--with` 是 0.35.0 之后尚未发布的能力，可以重复使用。它把 Shine 配置中的 `KEY` 仅提供给本次启动的子进程；写成
+`KEY=ALIAS` 可改变子进程看到的变量名。只使用 `--with` 时不要求存在
+`shine.workspace.toml`。
 
 ## 自定义来源与程序升级
 
@@ -94,4 +99,3 @@ shine overlay unlink
 shine self install [--dest <PATH>]
 shine self upgrade [--channel <stable|preview>]
 ```
-
