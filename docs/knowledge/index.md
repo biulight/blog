@@ -19,4 +19,5 @@ sidebar_position: 1
 ## 指南
 
 - [使用 ZeroTier、CoreDNS 和 Shine 搭建异地私有域名网络](./zerotier-coredns-split-dns.md)
+- [终端代理误拦截 ZeroTier 私有域名的排查与修复](./terminal-proxy-no-proxy-zerotier.md)
 - [在 macOS 和 Windows 使用 YubiKey OpenPGP](./yubikey-openpgp.md)

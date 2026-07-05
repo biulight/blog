@@ -58,6 +58,9 @@ shine upgrade --verbose
 
 如果使用项目 `shine.config.toml`、项目 `shine.env.toml` 或 overlay，请确认当前工作目录和覆盖优先级。
 
+如果问题表现为私有域名或 `192.168.x.x` 地址仍然被终端代理接管，可继续参考知识库中的
+[终端代理误拦截 ZeroTier 私有域名的排查与修复](../../knowledge/terminal-proxy-no-proxy-zerotier.md)。
+
 ## `shine pull` 拒绝更新来源
 
 `shine pull` 只对干净、已设置 upstream 的普通分支执行快进更新。先进入错误信息显示的仓库并检查：
