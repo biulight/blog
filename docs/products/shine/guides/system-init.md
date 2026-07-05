@@ -46,6 +46,9 @@ shine sys uninstall split-dns --dry-run
 shine sys uninstall split-dns
 ```
 
+需要把异地局域网中的私有域名定向到 ZeroTier DNS 时，可参考
+[使用 ZeroTier、CoreDNS 和 Shine 搭建异地私有域名网络](/knowledge/zerotier-coredns-split-dns)。
+
 系统 profile 会尽量合并并保留用户内容。只有明确希望备份并替换冲突 profile 时，才使用 `shine sys init --force-profile`。
 
 ## 平台说明
@@ -54,4 +57,3 @@ shine sys uninstall split-dns
 - Ubuntu 支持 bash 和 zsh。
 - Windows 系统预设和 profile 集成使用 PowerShell。
 - Ubuntu 与 macOS 可自动识别终端明暗背景并设置 `SHINE_TERMINAL_THEME`；设置 `SHINE_SYNC_TERMINAL_THEME=0` 可关闭。
-

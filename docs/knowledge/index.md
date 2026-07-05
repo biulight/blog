@@ -15,3 +15,8 @@ sidebar_position: 1
 - 经过实际项目或权威资料验证，而不是来自待实现计划。
 
 只适用于某个产品的说明应放入对应的[产品手册](/products)。
+
+## 指南
+
+- [使用 ZeroTier、CoreDNS 和 Shine 搭建异地私有域名网络](./zerotier-coredns-split-dns.md)
+- [在 macOS 和 Windows 使用 YubiKey OpenPGP](./yubikey-openpgp.md)
