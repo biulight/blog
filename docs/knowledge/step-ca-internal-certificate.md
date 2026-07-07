@@ -520,32 +520,58 @@ CA 签发的单域名证书和通配符证书，新增子域时不需要再次�
 维护主机地址，不提供 Certbot 所需的 TXT 记录自动更新接口，因此不能只把前文的
 `--domain` 改成通配符后继续申请。
 
-在当前完全受控的私有网络里，最小改动方案是使用初始化时创建的 `admin` JWK provisioner
-签发第一张通配符证书，再让 `step ca renew` 使用现有证书和私钥自动续期。这样无需先改造
-CoreDNS 的动态 DNS 能力，但 `admin` 的签发权限较高，以下操作只能在受控的 CA 主机上执行。
+在当前完全受控的私有网络里，最小改动方案是直接使用 step-ca 容器自带的 `step` CLI 和
+初始化时创建的 `admin` JWK provisioner。宿主机不需要再安装或引导一套 `step`；把 Nginx
+证书目录挂进容器后，签发和续期都在容器内完成。这样无需先改造 CoreDNS 的动态 DNS 能力，
+但 `admin` 的签发权限较高，以下操作只能在受控的 CA 主机上执行。
 
-先安装 `step` CLI、完成 CA 引导，并创建只有 root 能读取的证书目录：
+先创建证书目录，并查看 step-ca 容器用户的 UID 和 GID：
 
 ```bash
-step ca bootstrap \
-  --ca-url https://ca.biulight.internal:9443 \
-  --fingerprint <ROOT_FINGERPRINT>
-
 sudo install -d -m 700 /etc/nginx/ssl/biulight.internal
+
+cd /opt/step-ca
+sudo docker compose exec -T step-ca id
 ```
 
-签发同时包含根域和通配符 SAN 的证书：
+记下输出中的 `<STEP_UID>` 和 `<STEP_GID>`，让容器用户能够写入证书目录：
 
 ```bash
-sudo step ca certificate "*.biulight.internal" \
-  /etc/nginx/ssl/biulight.internal/fullchain.pem \
-  /etc/nginx/ssl/biulight.internal/privkey.pem \
+sudo chown <STEP_UID>:<STEP_GID> \
+  /etc/nginx/ssl/biulight.internal
+```
+
+在 `compose.yaml` 的 `step-ca` 服务中增加一个读写挂载：
+
+```yaml
+services:
+  step-ca:
+    volumes:
+      - step_ca_data:/home/step
+      - /etc/nginx/ssl/biulight.internal:/var/local/step-wildcard
+```
+
+保留原有的 `step_ca_data`，然后重新创建容器。这个操作不会重新初始化或删除 CA：
+
+```bash
+cd /opt/step-ca
+sudo docker compose up -d --force-recreate
+sudo docker compose ps
+```
+
+直接在 step-ca 容器内签发同时包含根域和通配符 SAN 的证书：
+
+```bash
+sudo docker compose exec -T step-ca \
+  step ca certificate "*.biulight.internal" \
+  /var/local/step-wildcard/fullchain.pem \
+  /var/local/step-wildcard/privkey.pem \
   --san biulight.internal \
   --san "*.biulight.internal" \
   --provisioner admin \
-  --provisioner-password-file /opt/step-ca/secrets/ca-password \
-  --ca-url https://ca.biulight.internal:9443 \
-  --root /usr/local/share/ca-certificates/biulight-internal-ca.crt
+  --provisioner-password-file /run/secrets/ca_password \
+  --ca-url https://localhost:9000 \
+  --root /home/step/certs/root_ca.crt
 
 sudo chmod 600 /etc/nginx/ssl/biulight.internal/privkey.pem
 ```
@@ -566,8 +592,9 @@ ssl_certificate_key /etc/nginx/ssl/biulight.internal/privkey.pem;
 检查 SAN、证书链和 Nginx 配置：
 
 ```bash
-step certificate inspect \
-  /etc/nginx/ssl/biulight.internal/fullchain.pem --short
+sudo docker compose exec -T step-ca \
+  step certificate inspect \
+  /var/local/step-wildcard/fullchain.pem --short
 
 sudo nginx -t
 sudo systemctl reload nginx
@@ -575,37 +602,54 @@ sudo systemctl reload nginx
 
 ### 自动续期通配符证书
 
-创建 `/etc/systemd/system/step-wildcard-renewer.service`：
+复用容器里的 `step ca renew`，由宿主机 systemd 定时触发。创建
+`/etc/systemd/system/step-wildcard-renewer.service`：
 
 ```ini
 [Unit]
 Description=Renew *.biulight.internal certificate
-After=network-online.target
+After=network-online.target docker.service
 Wants=network-online.target
+Requires=docker.service
 
 [Service]
-Type=simple
-Restart=always
-RestartSec=30
-ExecStart=/usr/bin/step ca renew --daemon \
-  --ca-url https://ca.biulight.internal:9443 \
-  --root /usr/local/share/ca-certificates/biulight-internal-ca.crt \
-  --exec "/bin/sh -c '/usr/sbin/nginx -t >/dev/null 2>&1 && /usr/bin/systemctl reload nginx'" \
-  /etc/nginx/ssl/biulight.internal/fullchain.pem \
-  /etc/nginx/ssl/biulight.internal/privkey.pem
-
-[Install]
-WantedBy=multi-user.target
+Type=oneshot
+WorkingDirectory=/opt/step-ca
+ExecStart=/usr/bin/docker compose exec -T step-ca \
+  step ca renew --force --expires-in 8h \
+  --ca-url https://localhost:9000 \
+  --root /home/step/certs/root_ca.crt \
+  /var/local/step-wildcard/fullchain.pem \
+  /var/local/step-wildcard/privkey.pem
+ExecStartPost=/bin/sh -c '/usr/sbin/nginx -t >/dev/null 2>&1 && /usr/bin/systemctl reload nginx'
 ```
 
-[`step ca renew --daemon`](https://smallstep.com/docs/step-cli/reference/ca/renew/) 默认会在证书
-有效期大约经过三分之二时续期，并加入随机抖动；
-续期成功后才执行 Nginx 配置检查与重载。启用并检查服务：
+如果 `command -v docker` 返回的不是 `/usr/bin/docker`，应把 `ExecStart` 中的路径改成实际
+路径。再创建 `/etc/systemd/system/step-wildcard-renewer.timer`：
+
+```ini
+[Unit]
+Description=Check *.biulight.internal certificate renewal every 6 hours
+
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:00:00
+RandomizedDelaySec=30m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+[`step ca renew`](https://smallstep.com/docs/step-cli/reference/ca/renew/) 会在证书剩余有效期不足
+8 小时时续期；`--force` 允许非交互覆盖原文件。服务完成后会检查并重载 Nginx。启用定时器
+并先手工运行一次服务：
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable --now step-wildcard-renewer.service
+sudo systemctl start step-wildcard-renewer.service
+sudo systemctl enable --now step-wildcard-renewer.timer
 systemctl status step-wildcard-renewer.service
+systemctl list-timers step-wildcard-renewer.timer
 journalctl -u step-wildcard-renewer.service -n 50 --no-pager
 ```
 
