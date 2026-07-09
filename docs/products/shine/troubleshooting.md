@@ -84,6 +84,27 @@ shine sys uninstall <ITEM> --dry-run
 
 不要依赖计划文档推断可用项目；以当前版本 `shine sys list` 和 `shine sys info` 为准。
 
+## SSH 文件传输不可用
+
+`shine local` 只能在 `shine ssh` 打开的远端 shell 中使用。若提示缺少 `SHINE_SSH_SESSION`、`SHINE_SSH_TOKEN` 或 `SHINE_SSH_REMOTE_SOCK`，请退出后重新用 `shine ssh <HOST>` 进入。
+
+远端也需要能运行兼容的 `shine local`。先检查：
+
+```bash
+shine local status
+which shine
+shine --version
+```
+
+传输前优先预览路径和覆盖行为：
+
+```bash
+shine local download ./remote.log ./remote.log --dry-run
+shine local upload ./local.log /tmp/local.log --dry-run
+```
+
+目标文件已存在时默认拒绝覆盖；确认无误后加 `--force`。目录目标已存在时，`--force` 表示合并写入。
+
 ## 自动更新检查失败
 
 网络或 GitHub API 不可用时，Shine 会跳过版本检查并继续执行原命令。恢复网络后可绕过 24 小时缓存重新检查：

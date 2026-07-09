@@ -7,8 +7,7 @@ sidebar_position: 5
 
 Shine 可以保存预设模板变量，也可以使用 GPG 封存项目环境中的敏感值。不要把真实密钥写进公开仓库或文档示例。
 
-`shine env seal`、workspace 形式的 `shine env run` 及 `env run --with` 均已包含在
-Shine 0.36.0 中。
+`shine env seal`、workspace 形式的 `shine env run`、`env run --with` 以及 `age` 密钥后端均已包含在 Shine 0.37.0 中。
 
 ## 查看和设置变量
 
@@ -82,6 +81,45 @@ eval "$(shine env export MY_TOKEN --as API_TOKEN)"
 
 安装 `utils` shell 预设后，也可以使用 `shine-env-export MY_TOKEN --as API_TOKEN`。
 
+## 使用 age 与 Touch ID
+
+Shine 支持 `age` 作为第二种密钥后端。它适合把密文提交到团队仓库中，并加密给多个成员各自的 recipient。已有 GPG 密文不需要迁移：不带标签的旧密文继续按 GPG 解密，`age` 后端生成的新密文会带有 `age:` 标签。
+
+先安装 `age`。macOS 上如需 Touch ID / Secure Enclave 身份，还需要 `age-plugin-se`：
+
+```bash
+brew install age age-plugin-se
+```
+
+生成身份并记录输出中的 recipient：
+
+```bash
+shine env identity init
+shine env identity init --touch-id
+shine env identity show
+```
+
+`--touch-id` 只适用于 macOS；解密时会触发系统 Touch ID 提示。普通身份使用 `age-keygen`，默认写入 `~/.shine/age/identity.txt`。
+
+把默认后端和团队 recipient 写入 `~/.shine/config.toml`：
+
+```toml
+secret_backend = "age"
+age_recipients = ["age1se1qexample...", "age1qteammate..."]
+age_identity = "~/.shine/age/identity.txt"
+```
+
+也可以只在单次命令中选择后端和 recipient：
+
+```bash
+shine env encrypt --backend age -r age1se1qexample... -r age1qteammate... --from MY_TOKEN
+shine env seal --backend age -r age1se1qexample... -r age1qteammate...
+```
+
+`-r/--recipient` 对 GPG 和 age 都可以重复使用。移除某个 recipient 不会撤销它对历史密文的访问；需要重新加密或重新 `seal` 才能轮换访问范围。
+
+如果 AI Agent 会参与开发，先阅读[在 AI Agent 参与开发时保护环境密钥](./agent-secret-safety.md)，确认 identity 文件、Touch ID 和命令执行权限的安全边界。
+
 ## 只向一个命令提供变量
 
 不修改当前终端、也不创建 workspace 文件时，使用可重复的 `--with`：
@@ -114,6 +152,9 @@ files = [
 
 [env.encryption]
 recipient = "user@example.com"
+# 也可使用 age
+# backend = "age"
+# age_recipients = ["age1se1qexample...", "age1qteammate..."]
 ```
 
 后面的环境文件覆盖前面的文件。`{mode}` 会替换为 `--mode` 指定的值；省略 `--mode`

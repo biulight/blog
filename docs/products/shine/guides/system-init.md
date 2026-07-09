@@ -49,6 +49,8 @@ shine sys uninstall split-dns
 需要把异地局域网中的私有域名定向到 ZeroTier DNS 时，可参考
 [使用 ZeroTier、CoreDNS 和 Shine 搭建异地私有域名网络](/knowledge/zerotier-coredns-split-dns)。
 
+在 Ubuntu 上，`split-dns` 依赖应用查询 `systemd-resolved` 的 `127.0.0.53` stub。Shine 会在检测到 stub 被关闭时给出警告或拒绝写入无效配置；先重新启用 `DNSStubListener`，或确认本机解析链路确实会经过 `systemd-resolved`，再应用该项目。
+
 系统 profile 会尽量合并并保留用户内容。只有明确希望备份并替换冲突 profile 时，才使用 `shine sys init --force-profile`。
 
 ## 平台说明

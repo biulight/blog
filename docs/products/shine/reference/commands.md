@@ -5,8 +5,7 @@ sidebar_position: 1
 
 # 命令参考
 
-本页已审阅至 Shine 0.36.0（提交 `a4129cc`）。任何子命令都可以使用 `--help`
-查看当前安装版本的准确参数。
+本页已审阅至 Shine 0.37.0（提交 `410f8b5`）。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
 
 ## 顶层命令
 
@@ -25,6 +24,8 @@ sidebar_position: 1
 | `shine export` | 导出内置预设到当前预设目录 |
 | `shine link <PATH>` | 设置外部预设目录 |
 | `shine unlink` | 移除外部预设目录设置 |
+| `shine ssh [SSH_ARGS]... <HOST> [COMMAND]` | 开启带会话级文件传输通道的 SSH 会话 |
+| `shine local <SUBCOMMAND>` | 在 `shine ssh` 远端会话内传输文件或查看连接状态 |
 
 所有命令都支持全局 `--config-dir <PATH>`，用于临时选择全局配置和运行时状态目录。
 
@@ -83,16 +84,31 @@ shine env show [--reveal]
 shine env set <KEY> <VALUE>
 shine env get <KEY>
 shine env delete <KEY>
-shine env encrypt [-r <RECIPIENT>] [--from <KEY>] [--set <KEY>]
+shine env encrypt [--backend <gpg|age>] [-r <RECIPIENT>]... [--from <KEY>] [--set <KEY>]
 shine env decrypt <KEY>
 shine env export <KEY> [--as <ALIAS>]
-shine env seal [FILE] [--workspace <FILE>] [-r <RECIPIENT>]
+shine env seal [FILE] [--workspace <FILE>] [--backend <gpg|age>] [-r <RECIPIENT>]...
 shine env run [--workspace <FILE>] [--mode <MODE>] [--with <KEY[=ALIAS]>]... -- <COMMAND>...
+shine env identity init [--touch-id] [--access-control <POLICY>] [-o <PATH>] [--force]
+shine env identity show
 ```
 
 `--with` 可以重复使用。它把 Shine 配置中的 `KEY` 仅提供给本次启动的子进程；写成
 `KEY=ALIAS` 可改变子进程看到的变量名。只使用 `--with` 时不要求存在
 `shine.workspace.toml`。
+
+`env identity init --touch-id` 只适用于 macOS，并依赖 `age-plugin-se`；未使用 `--touch-id` 时依赖 `age-keygen`。
+
+## SSH 文件传输
+
+```text
+shine ssh [SSH_ARGS]... <HOST> [COMMAND]
+shine local download <REMOTE_SOURCE> [LOCAL_DESTINATION] [--force] [--dry-run]
+shine local upload <LOCAL_SOURCE> [REMOTE_DESTINATION] [--force] [--dry-run]
+shine local status
+```
+
+`shine ssh` 会把普通 `ssh` 参数原样传给系统 `ssh`，并额外建立本次会话可用的传输通道。`shine local` 必须在这个远端 shell 中运行；`download` 表示从远端下载到本机，`upload` 表示把本机文件或目录上传到远端。目标已存在时先使用 `--dry-run` 预览，确认后再加 `--force` 覆盖文件或合并目录。
 
 ## 自定义来源与程序升级
 

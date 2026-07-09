@@ -14,6 +14,10 @@ presets_dir = "~/dotfiles/shine-presets"
 app_default_dest_root = "~/.config"
 gpg_key_id = "user@example.com"
 
+secret_backend = "age"
+age_recipients = ["age1se1qexample...", "age1qteammate..."]
+age_identity = "~/.shine/age/identity.txt"
+
 [env]
 HTTP_PROXY_PORT = "6152"
 SOCKS5_PROXY_PORT = "6153"
@@ -27,6 +31,9 @@ MY_API_TOKEN = { value = "<令牌>", description = "内部 API 的访问令牌" 
 | `presets_dir` | 使用完整的外部预设目录替代内置预设 |
 | `app_default_dest_root` | 未声明目标路径的旧式 app 预设默认根目录 |
 | `gpg_key_id` | `shine env encrypt` 默认 GPG recipient |
+| `secret_backend` | 默认密钥后端，省略时为 `gpg` |
+| `age_recipients` | `age` 后端默认加密接收者列表 |
+| `age_identity` | 解密 `age:` 密文时使用的身份文件路径，省略时可使用 `~/.shine/age/identity.txt` |
 | `[env]` | 模板变量及 shell helper 使用的值 |
 
 ## Env 条目格式与说明
@@ -108,6 +115,9 @@ files = [
 
 [env.encryption]
 recipient = "user@example.com"
+# 也可使用 age 后端
+# backend = "age"
+# age_recipients = ["age1se1qexample...", "age1qteammate..."]
 ```
 
 环境源按 `files` 顺序合并。默认保留当前进程已经存在的变量；设置 `env.override_process_env = true` 后，改由 workspace 值覆盖。
