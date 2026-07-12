@@ -35,7 +35,7 @@ export default function Home(): React.JSX.Element {
   return (
     <Layout
       title="产品手册与知识库"
-      description="Biulight 产品手册、实践指南与持续沉淀的知识。">
+      description="Biulight 产品手册与实践指南。">
       <HomepageHeader />
       <main className={styles.main}>
         <section className="container">
@@ -50,7 +50,7 @@ export default function Home(): React.JSX.Element {
             <div className="col col--6">
               <div className={styles.card}>
                 <h2>知识库</h2>
-                <p>沉淀跨项目可复用、经过验证的实践知识。</p>
+                <p>查找网络、证书、终端和安全配置等实践指南。</p>
                 <Link to="/knowledge">进入知识库 →</Link>
               </div>
             </div>

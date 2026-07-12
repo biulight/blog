@@ -8,7 +8,7 @@ const darkTheme = themes.dracula;
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Biulight 文档',
-  tagline: '产品手册、实践指南与持续沉淀的知识',
+  tagline: '产品手册与实践指南',
   url: 'https://blog.biulight.cn',
   baseUrl: '/timeline/',
   onBrokenLinks: 'throw',
