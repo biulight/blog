@@ -54,3 +54,26 @@ shine app uninstall starship --purge
 
 `shine update` 比较的是变换后的最终结果，而不是原始预设文件。
 
+## 构建辅助资源
+
+部分 app 预设会在 `shine.toml` 的 `[artifact]` 中声明脚本。需要生成或刷新这类资源时，手动运行：
+
+```bash
+shine app build surge
+```
+
+构建不会在 `install` 或 `upgrade` 中自动发生；失败会让命令直接失败。脚本可读取当前 `[env]` 值和 `SHINE_APP_HTTP_DIR`、`SHINE_CACHE_DIR`、`SHINE_STATE_DIR` 等路径变量，适合生成放在 `~/.shine/http/app/<APP_ID>/` 下的本地资源。完整变量说明见[任务与本地服务](./tasks-and-serve.md)。
+
+内置 `surge` app 预设会把 `local-proxies.conf` 和 `local-rules.conf` 安装到 Surge Profiles 目录。`shine app build surge` 用于按当前 overlay 中的脚本修补活动配置文件的 `[Proxy]` 与 `[Rule]` `#!include` 行。
+
+## 升级后钩子
+
+预设作者可以声明 `post_upgrade` 钩子。只有 `shine upgrade` 实际更新该类别至少一个文件后，钩子才会运行；未变化的类别不会触发。
+
+外部预设中的钩子需要在配置中显式允许：
+
+```toml
+allow_app_hooks = true
+```
+
+钩子默认不显示 stdout；只有预设将 `show_output` 设为 `true` 时，成功输出才会作为提示显示。钩子失败会显示警告，但不会中断其它类别的升级。

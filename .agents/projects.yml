@@ -11,8 +11,8 @@ projects:
       - CHANGELOG.md
       - cli/src/commands
       - Cargo.toml
-    last_reviewed_ref: 410f8b5d98b767bd84d6368f0bba216f4a2684b5
-    last_reviewed_version: 0.37.0
+    last_reviewed_ref: 50687c3a1d4f76706d7affbf43e93e3c8bd190f6
+    last_reviewed_version: 0.38.0
 
   - id: deskmesh
     name: Deskmesh

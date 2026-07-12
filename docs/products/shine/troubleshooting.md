@@ -84,6 +84,35 @@ shine sys uninstall <ITEM> --dry-run
 
 不要依赖计划文档推断可用项目；以当前版本 `shine sys list` 和 `shine sys info` 为准。
 
+Windows 或其它工具改写过的 PowerShell、bash 或 zsh profile 可能使用 CRLF 换行。Shine 0.38.0 起的系统 profile 合并会按内容匹配受管区块，不会仅因 CRLF/LF 差异反复重写文件。若旧版本已留下冲突标记，先手工处理冲突，再重新运行 `shine sys init --dry-run` 或对应 `upgrade`。
+
+## 本地 HTTP 服务无法访问资源
+
+先确认服务和 URL：
+
+```bash
+shine serve status
+shine serve url app/surge/custom-rules.sgmodule
+```
+
+`shine serve install` 当前只支持 macOS 用户服务；其它环境可用 `shine serve start` 在前台运行。服务只发布 `~/.shine/http/` 下的文件，资源不存在时应先运行对应的 `shine app build <APP_ID>`。
+
+请不要把敏感文件放入 `~/.shine/http/`。服务绑定在 `127.0.0.1`，但没有额外认证。
+
+## 任务运行结果和手动执行不同
+
+`shine task` 不经过 shell，而是直接按保存的参数数组启动程序。包含管道、重定向、变量展开或通配符的命令需要显式保存 shell：
+
+```bash
+shine task save kill-port -- sh -c 'lsof -ti :3000 | xargs kill'
+```
+
+额外参数会追加到已保存命令末尾：
+
+```bash
+shine task run my-task -- --verbose
+```
+
 ## SSH 文件传输不可用
 
 `shine local` 只能在 `shine ssh` 打开的远端 shell 中使用。若提示缺少 `SHINE_SSH_SESSION`、`SHINE_SSH_TOKEN` 或 `SHINE_SSH_REMOTE_SOCK`，请退出后重新用 `shine ssh <HOST>` 进入。

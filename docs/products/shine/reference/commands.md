@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # 命令参考
 
-本页已审阅至 Shine 0.37.0（提交 `410f8b5`）。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
+本页已审阅至 Shine 0.38.0（提交 `50687c3`）。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
 
 ## 顶层命令
 
@@ -21,11 +21,14 @@ sidebar_position: 1
 | `shine update` | 检查受管内容和 Shine 稳定版更新 |
 | `shine upgrade` | 更新已安装的 shell 与 app 配置 |
 | `shine clear` | 清理架构变更后遗留的旧运行时状态 |
+| `shine serve <SUBCOMMAND>` | 通过本地 HTTP 服务发布 `~/.shine/http/` 下的受管资源 |
 | `shine export` | 导出内置预设到当前预设目录 |
 | `shine link <PATH>` | 设置外部预设目录 |
 | `shine unlink` | 移除外部预设目录设置 |
 | `shine ssh [SSH_ARGS]... <HOST> [COMMAND]` | 开启带会话级文件传输通道的 SSH 会话 |
 | `shine local <SUBCOMMAND>` | 在 `shine ssh` 远端会话内传输文件或查看连接状态 |
+| `shine task <SUBCOMMAND>` | 保存、运行和管理个人快捷命令 |
+| `shine run <NAME> [-- EXTRA_ARGS...]` | 运行已保存任务，等同于 `shine task run` |
 
 所有命令都支持全局 `--config-dir <PATH>`，用于临时选择全局配置和运行时状态目录。
 
@@ -44,9 +47,12 @@ shine app info <CATEGORY>
 shine app install [CATEGORY] [--dry-run]
 shine app reinstall [CATEGORY] [--dry-run]
 shine app uninstall [CATEGORY] [--force] [--purge] [--dry-run]
+shine app build <APP_ID>
 ```
 
 `app uninstall --force` 会删除安装后已被修改的受管文件，使用前应先运行 `--dry-run` 并确认不再需要这些修改。
+
+`app build` 只运行该 app 预设在 `[artifact]` 中声明的脚本，不会在 `install` 或 `upgrade` 时自动触发。
 
 ## 状态、更新与补全
 
@@ -76,6 +82,25 @@ shine sys init [--preset <PROFILE>] [--dry-run] [--force-profile]
 shine sys apply [ITEM] [--dry-run]
 shine sys uninstall <ITEM> [--dry-run]
 ```
+
+## 任务与本地 HTTP 服务
+
+```text
+shine task save <NAME> [--force] -- <COMMAND>...
+shine task run <NAME> [-- EXTRA_ARGS...]
+shine task list
+shine task info <NAME>
+shine task delete <NAME>
+shine run <NAME> [-- EXTRA_ARGS...]
+
+shine serve install [--port <PORT>]
+shine serve start [--port <PORT>]
+shine serve status
+shine serve uninstall
+shine serve url <PATH> [--port <PORT>]
+```
+
+任务命令按参数数组保存并直接执行，不经过 shell。需要管道、重定向或通配符时，请显式保存 `sh -c '...'` 这类命令。`shine serve install` 当前只支持 macOS 用户服务；`start` 可在前台启动同一个本地服务。
 
 ## 环境变量
 

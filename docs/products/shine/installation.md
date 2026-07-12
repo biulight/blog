@@ -23,7 +23,7 @@ shine --version
 
 ```bash
 SHINE_INSTALL_DIR=/custom/bin sh install.sh
-SHINE_VERSION=0.37.0 sh install.sh
+SHINE_VERSION=0.38.0 sh install.sh
 ```
 
 ## Windows PowerShell
@@ -36,7 +36,7 @@ irm https://github.com/biulight/shine/releases/latest/download/install.ps1 | iex
 
 ```powershell
 $env:SHINE_INSTALL_DIR = "$env:USERPROFILE\bin"; .\install.ps1
-$env:SHINE_VERSION = "0.37.0"; .\install.ps1
+$env:SHINE_VERSION = "0.38.0"; .\install.ps1
 ```
 
 ## 从源码安装
@@ -58,5 +58,7 @@ shine self upgrade --channel preview
 ```
 
 `preview` 是持续滚动的预发布通道，不参与日常自动更新检查。运行 `shine update` 可以同时检查已安装配置和稳定版程序更新。
+
+在 Unix 系统上，如果 `shine self install` 或 `shine self upgrade` 需要写入当前用户不可写的位置，Shine 会自动通过 `sudo` 重新执行复制步骤。Windows 仍需要在有权限的终端中完成受保护位置的安装。
 
 下一步：[完成第一次预设安装](./quick-start.md)。
