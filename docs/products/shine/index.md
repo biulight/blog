@@ -9,7 +9,7 @@ description: 使用 Shine 管理 shell 命令、应用配置与系统初始化�
 
 Shine 是一个跨平台命令行工具，将常用 shell 脚本、应用配置和系统初始化步骤打包成可安装、可检查、可升级、可安全卸载的预设。
 
-当前手册适用于 **Shine 0.38.0**。
+当前手册适用于 **Shine 0.38.0**，并包含尚未发布到稳定版的内容。
 
 ## 可以用它做什么
 
@@ -21,12 +21,13 @@ Shine 是一个跨平台命令行工具，将常用 shell 脚本、应用配置�
 - 使用 `age` 与可选的 macOS Touch ID 管理团队共享密钥。
 - 通过 `shine ssh` 会话在本机和远端之间传输文件或目录。
 - 保存常用个人命令，并为应用预设生成可由本地 HTTP 服务读取的辅助资源。
+- 自动识别终端明暗主题，为 `bat` 和远端 SSH 会话提供一致的主题环境变量。
 - 比较已安装文件与预设，升级时只处理 Shine 管理的内容。
 
 ## 从这里开始
 
 1. [安装 Shine](./installation.md)
 2. [完成第一次预设安装](./quick-start.md)
-3. 根据目标阅读 [Shell 预设](./guides/shell-presets.md)、[应用预设](./guides/app-presets.md)、[系统初始化](./guides/system-init.md)、[任务与本地服务](./guides/tasks-and-serve.md) 或 [SSH 会话文件传输](./guides/ssh-transfer.md)
+3. 根据目标阅读 [Shell 预设](./guides/shell-presets.md)、[应用预设](./guides/app-presets.md)、[系统初始化](./guides/system-init.md)、[终端主题同步](./guides/terminal-theme-sync.md)、[任务与本地服务](./guides/tasks-and-serve.md) 或 [SSH 会话文件传输](./guides/ssh-transfer.md)
 
 如果已经遇到问题，直接前往[故障排查](./troubleshooting.md)。完整命令入口见[命令参考](./reference/commands.md)。

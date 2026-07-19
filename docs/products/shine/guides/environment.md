@@ -22,7 +22,7 @@ shine env delete HTTP_PROXY_PORT
 `localhost,127.0.0.1,::1`。修改它或其他代理变量后，`shine update` 会把已安装的
 `proxy` shell 预设标记为可更新；运行 `shine upgrade` 应用新值。
 
-`shine env show` 默认隐藏敏感值；`--reveal` 会显示完整值，应只在安全终端中使用。变量通常保存到当前配置的 `[env]` 表。
+`shine env show` 默认隐藏敏感值；`--reveal` 会显示完整值，应只在安全终端中使用。输出会按实际来源分为 `config.toml`、全局覆盖文件、overlay 和项目覆盖文件，便于确认哪个值正在生效。变量通常保存到当前配置的 `[env]` 表。
 
 全局 `~/.shine/config.toml` 和项目 `shine.config.toml` 的 `[env]` 支持简写字符串，也支持
 同时记录值和说明：
@@ -36,6 +36,16 @@ MY_API_TOKEN = { value = "<令牌>", description = "内部 API 的访问令牌" 
 `value` 的使用方式与简写字符串完全相同；`description` 会显示在 `shine env show` 中。
 对已有详细条目执行 `shine env set MY_API_TOKEN <新值>` 时，Shine 会更新 `value` 并保留
 说明。
+
+若同名键已由全局、overlay 或项目 `shine.env.toml` 覆盖，直接 `set`、`delete` 或 `env encrypt --set` 会被拒绝，防止写入一个不会生效的低优先级值。确认应修改该覆盖文件时，添加 `--force`：
+
+```bash
+shine env set HTTP_PROXY_PORT 7890 --force
+shine env delete HTTP_PROXY_PORT --force
+shine env encrypt --from MY_TOKEN --set MY_TOKEN_SECRET --force
+```
+
+对于 `shine overlay link --git` 管理的镜像，`--force` 写入会在下次 `shine pull` 时被丢弃；应改在 overlay 上游仓库维护该值。
 
 不带 `[env]` 表头的全局、overlay 和项目 `shine.env.toml` 覆盖文件也支持这两种格式：
 
@@ -128,10 +138,15 @@ shine env seal --backend age -r age1se1qexample... -r age1qteammate...
 shine env run --with MY_TOKEN -- bun run build
 shine env run --with MY_TOKEN=API_TOKEN -- bun run build
 shine env run --with TOKEN_A --with TOKEN_B=OTHER_TOKEN -- bun run build
+shine env run --no-workspace --with MY_TOKEN -- bun run build
 ```
 
 每个 `KEY` 都优先解密 `<KEY>_SECRET`，不存在时才读取明文 `<KEY>`。等号右侧是子进程中
 的变量名。显式 `--with` 值优先于当前进程和 workspace 的同名变量。
+
+`--no-workspace` 会完全跳过 `shine.workspace.toml` 查找，只合并当前进程环境和显式
+`--with`；它不能与 `--workspace` 或 `--mode` 同时使用。这个模式也用于需要固定读取
+Shine 配置环境、但不应受当前工作目录影响的受管 Bun 命令入口。
 
 ## 使用分层项目环境
 

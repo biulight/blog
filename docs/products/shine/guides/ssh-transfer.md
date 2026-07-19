@@ -19,6 +19,20 @@ shine ssh user@example.com uname -a
 
 远端主机需要能运行同版本兼容的 `shine local`。当前实现假定远端是 Unix/macOS/Linux shell；Windows 可作为本机端发起 `shine ssh`。
 
+## 转发选定的环境变量
+
+只在本次远端会话或命令中提供本机 Shine 环境值时，把选项写在 SSH 目标之前：
+
+```bash
+shine ssh --with API_URL dev
+shine ssh --with LOCAL_NAME=REMOTE_NAME dev 'printenv REMOTE_NAME'
+shine ssh --with-secret API_TOKEN dev
+```
+
+`--with` 只读取完全同名的明文 `[env]` 键，不会自动解密 `KEY_SECRET`；需要解密时必须显式使用 `--with-secret KEY[=ALIAS]`。值只写入远端进程环境，不写远端配置文件，但远端 shell 启动文件仍可能再次覆盖同名变量。
+
+转发密钥意味着远端主机可以读取明文；本机或远端具有足够权限、或同一用户的其它进程也可能从进程参数或环境中看到它。只向可信主机转发必要的键，不要把令牌直接写在命令行中。
+
 ## 从远端下载到本机
 
 在 `shine ssh` 打开的远端 shell 中运行：
@@ -32,7 +46,7 @@ shine local download ./dist ./dist-copy
 
 `download` 的来源路径由远端解析，目标路径由本机解析。未指定目标时，Shine 会把文件或目录放到本机启动 `shine ssh` 时所在目录，并沿用来源名称。
 
-目录下载会打包后传输再解包。目标文件已存在时默认拒绝覆盖；目录已存在时加 `--force` 表示合并写入。
+Shine 会在本机端重新发起系统 `rsync` 或 `scp` 传输；优先使用 `rsync`，不可用时回退到 `scp`。两端都需要可用的 `ssh`，目录传输还需要两端具有同一种可用工具（优先 `rsync`，否则 `scp`）。目标文件已存在时默认拒绝覆盖；目录已存在时加 `--force` 表示合并写入。
 
 ## 从本机上传到远端
 

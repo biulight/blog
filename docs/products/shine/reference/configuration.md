@@ -13,6 +13,7 @@ Shine 将全局运行时状态保存在 `~/.shine/`。首次需要配置时会�
 presets_dir = "~/dotfiles/shine-presets"
 app_default_dest_root = "~/.config"
 allow_app_hooks = true
+sync_terminal_theme = true
 gpg_key_id = "user@example.com"
 
 secret_backend = "age"
@@ -31,7 +32,8 @@ MY_API_TOKEN = { value = "<令牌>", description = "内部 API 的访问令牌" 
 | --- | --- |
 | `presets_dir` | 使用完整的外部预设目录替代内置预设 |
 | `app_default_dest_root` | 未声明目标路径的旧式 app 预设默认根目录 |
-| `allow_app_hooks` | 允许外部 app 预设在 `shine upgrade` 后运行 `post_upgrade` 钩子 |
+| `allow_app_hooks` | 允许外部 app 预设在安装或升级后运行生命周期钩子 |
+| `sync_terminal_theme` | 控制受管 Unix shell profile 是否自动运行终端主题同步，默认为启用 |
 | `gpg_key_id` | `shine env encrypt` 默认 GPG recipient |
 | `secret_backend` | 默认密钥后端，省略时为 `gpg` |
 | `age_recipients` | `age` 后端默认加密接收者列表 |

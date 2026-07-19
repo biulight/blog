@@ -23,11 +23,23 @@ shine sys init --dry-run
 ```bash
 shine sys init
 shine sys init --preset recommended
+shine sys init --preset minimal
+shine sys init --proxy --dry-run
 ```
 
 - 在交互式终端中，`shine sys init` 会打开多选界面。
 - 指定 `--preset` 时直接应用命名 profile。
 - 非交互环境没有指定 profile 时使用预设的默认 profile。
+
+Ubuntu 还提供 `minimal` profile，适合生产服务器：仅安装 Neovim、fzf、bat、eza 和 zoxide，不包含 shell 历史同步、提示符、Node.js 工具链或 Homebrew。运行前仍应先执行 `shine sys init --preset minimal --dry-run` 复核当前版本的实际步骤。
+
+下载需要经过 HTTP 代理时，添加 `--proxy`。Shine 会根据 `[env]` 中的 `PROXY_HOST`、`HTTP_PROXY_PORT` 和 `PROXY_NO_PROXY` 为初始化脚本设置大小写两套代理变量；默认地址为 `http://127.0.0.1:6152`。先配合 `--dry-run` 检查实际注入值。
+
+Windows 的 `winget` 不读取这些环境变量，因此 Shine 还会显式传递 `winget install --proxy`。若系统尚未启用该选项，请在管理员 PowerShell 中先运行：
+
+```powershell
+winget settings --enable ProxyCommandLineOptions
+```
 
 完成后检查记录：
 

@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # 管理 Shell 预设
 
-Shell 预设把脚本安装到 Shine 的受管目录，并在 `~/.shine/bin/` 创建可直接调用的命令入口。Shine 支持 bash、zsh 和 PowerShell。
+Shell 预设把脚本安装到 Shine 的受管目录，并在 `~/.shine/bin/` 创建可直接调用的命令入口。Shine 当前支持 Bash、Zsh 和 PowerShell 的 profile 与命令目录管理；原生命令入口使用 `.sh` 或 `.ps1`，Bun 可作为另一种跨平台命令运行时。
 
 ## 查看与安装
 
@@ -55,7 +55,9 @@ shine shell uninstall proxy --purge
 | `proxy` | `setproxy`、`usetproxy` | 设置或清除当前终端会话的代理变量 |
 | `utils` | `copyfile` | 通过 OSC52 将文件内容复制到本地剪贴板 |
 | `utils` | `shine-env-export` | 将 Shine env 值载入当前 shell |
+| `utils` | `shine-theme-sync` | 输出当前终端明暗主题的 shell `export` 语句 |
 | `agent` | `ccenv` | 为 Claude Code + DeepSeek provider 配置当前会话 |
 
 某些类别按平台提供不同脚本；`shine shell list` 只显示当前平台可用的条目。
 
+想用 Bun 编写跨平台命令预设？请参阅[可选运行时的 Shell 入口](./custom-presets.md#可选运行时的-shell-入口)。

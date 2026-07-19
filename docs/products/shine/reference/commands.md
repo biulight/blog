@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # 命令参考
 
-本页已审阅至 Shine 0.38.0（提交 `50687c3`）。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
+本页已审阅至提交 `0b9fdb5`（含未发布内容）。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
 
 ## 顶层命令
 
@@ -22,10 +22,11 @@ sidebar_position: 1
 | `shine upgrade` | 更新已安装的 shell 与 app 配置 |
 | `shine clear` | 清理架构变更后遗留的旧运行时状态 |
 | `shine serve <SUBCOMMAND>` | 通过本地 HTTP 服务发布 `~/.shine/http/` 下的受管资源 |
+| `shine theme sync` | 解析终端明暗主题并输出 shell `export` 语句 |
 | `shine export` | 导出内置预设到当前预设目录 |
 | `shine link <PATH>` | 设置外部预设目录 |
 | `shine unlink` | 移除外部预设目录设置 |
-| `shine ssh [SSH_ARGS]... <HOST> [COMMAND]` | 开启带会话级文件传输通道的 SSH 会话 |
+| `shine ssh [--with <KEY[=ALIAS]>]... [--with-secret <KEY[=ALIAS]>]... [SSH_ARGS]... <HOST> [COMMAND]` | 开启带文件传输和可选环境变量转发的 SSH 会话 |
 | `shine local <SUBCOMMAND>` | 在 `shine ssh` 远端会话内传输文件或查看连接状态 |
 | `shine task <SUBCOMMAND>` | 保存、运行和管理个人快捷命令 |
 | `shine run <NAME> [-- EXTRA_ARGS...]` | 运行已保存任务，等同于 `shine task run` |
@@ -48,11 +49,13 @@ shine app install [CATEGORY] [--dry-run]
 shine app reinstall [CATEGORY] [--dry-run]
 shine app uninstall [CATEGORY] [--force] [--purge] [--dry-run]
 shine app build <APP_ID>
+shine app unbuild <APP_ID>
 ```
 
 `app uninstall --force` 会删除安装后已被修改的受管文件，使用前应先运行 `--dry-run` 并确认不再需要这些修改。
 
-`app build` 只运行该 app 预设在 `[artifact]` 中声明的脚本，不会在 `install` 或 `upgrade` 时自动触发。
+`app build` 只运行该 app 预设在 `[artifact]` 中声明的脚本；Shine 不会隐式构建，但预设可通过 `post_install` 或 `post_upgrade` 钩子显式调用它。
+`app unbuild` 运行对应的 `teardown` 脚本，反转此前构建产生的外部修改。
 
 ## 状态、更新与补全
 
@@ -78,10 +81,18 @@ shine completions <bash|zsh|powershell>
 shine sys list [--all]
 shine sys info <ITEM>
 shine sys status
-shine sys init [--preset <PROFILE>] [--dry-run] [--force-profile]
+shine sys init [--preset <PROFILE>] [--dry-run] [--force-profile] [--proxy]
 shine sys apply [ITEM] [--dry-run]
 shine sys uninstall <ITEM> [--dry-run]
 ```
+
+## 终端主题
+
+```text
+shine theme sync [--auto] [--quiet]
+```
+
+手动运行时无需 `--auto`；该参数仅供受管 shell profile 在自动同步时遵守配置开关使用。
 
 ## 任务与本地 HTTP 服务
 
@@ -106,42 +117,46 @@ shine serve url <PATH> [--port <PORT>]
 
 ```text
 shine env show [--reveal]
-shine env set <KEY> <VALUE>
+shine env set <KEY> <VALUE> [--force]
 shine env get <KEY>
-shine env delete <KEY>
-shine env encrypt [--backend <gpg|age>] [-r <RECIPIENT>]... [--from <KEY>] [--set <KEY>]
+shine env delete <KEY> [--force]
+shine env encrypt [--backend <gpg|age>] [-r <RECIPIENT>]... [--from <KEY>] [--set <KEY>] [--force]
 shine env decrypt <KEY>
 shine env export <KEY> [--as <ALIAS>]
 shine env seal [FILE] [--workspace <FILE>] [--backend <gpg|age>] [-r <RECIPIENT>]...
-shine env run [--workspace <FILE>] [--mode <MODE>] [--with <KEY[=ALIAS]>]... -- <COMMAND>...
+shine env run [--workspace <FILE>] [--mode <MODE>] [--no-workspace] [--with <KEY[=ALIAS]>]... -- <COMMAND>...
 shine env identity init [--touch-id] [--access-control <POLICY>] [-o <PATH>] [--force]
 shine env identity show
 ```
 
 `--with` 可以重复使用。它把 Shine 配置中的 `KEY` 仅提供给本次启动的子进程；写成
-`KEY=ALIAS` 可改变子进程看到的变量名。只使用 `--with` 时不要求存在
-`shine.workspace.toml`。
+`KEY=ALIAS` 可改变子进程看到的变量名。`--no-workspace` 会跳过 workspace 查找，仅使用
+显式 `--with` 和进程已有环境；它不能与 `--workspace` 或 `--mode` 同时使用。
 
 `env identity init --touch-id` 只适用于 macOS，并依赖 `age-plugin-se`；未使用 `--touch-id` 时依赖 `age-keygen`。
+
+如果某个键当前由 `shine.env.toml` 覆盖，`set`、`delete` 和带 `--set` 的 `encrypt` 会拒绝写入无效的低优先级配置。确认要修改实际生效的覆盖文件时，显式添加 `--force`。
 
 ## SSH 文件传输
 
 ```text
-shine ssh [SSH_ARGS]... <HOST> [COMMAND]
+shine ssh [--with <KEY[=ALIAS]>]... [--with-secret <KEY[=ALIAS]>]... [SSH_ARGS]... <HOST> [COMMAND]
 shine local download <REMOTE_SOURCE> [LOCAL_DESTINATION] [--force] [--dry-run]
 shine local upload <LOCAL_SOURCE> [REMOTE_DESTINATION] [--force] [--dry-run]
 shine local status
 ```
 
-`shine ssh` 会把普通 `ssh` 参数原样传给系统 `ssh`，并额外建立本次会话可用的传输通道。`shine local` 必须在这个远端 shell 中运行；`download` 表示从远端下载到本机，`upload` 表示把本机文件或目录上传到远端。目标已存在时先使用 `--dry-run` 预览，确认后再加 `--force` 覆盖文件或合并目录。
+Shine 自己的 `--with`、`--with-secret` 必须写在 SSH 目标之前；其余参数会传给系统 `ssh`。`--with` 只读取同名明文配置，`--with-secret` 才会解密 `<KEY>_SECRET`。`shine local` 必须在这个远端 shell 中运行；目标已存在时先使用 `--dry-run` 预览，确认后再加 `--force` 覆盖文件或合并目录。
 
 ## 自定义来源与程序升级
 
 ```text
-shine overlay link <PATH> [--create]
+shine overlay link [<PATH> | --git <URL> [--branch <BRANCH>]] [--create]
 shine overlay show
 shine overlay unlink
 shine pull
 shine self install [--dest <PATH>]
 shine self upgrade [--channel <stable|preview>]
 ```
+
+预设作者可在 shell 类别的 `shine.toml` 文件条目中设置 `runtime = "bun"`，为 TypeScript 或 JavaScript 创建命令入口；这不是单独的 Shine 命令，也是当前唯一可选运行时。规则、前提和未来扩展边界见[可选运行时的 Shell 入口](../guides/custom-presets.md#可选运行时的-shell-入口)。

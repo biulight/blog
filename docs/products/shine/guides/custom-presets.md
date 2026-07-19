@@ -19,6 +19,18 @@ shine overlay unlink
 
 例如 `app/starship/starship.toml` 会覆盖基础来源中的同路径文件，其它预设继续沿用基础来源。
 
+### 使用 Git 镜像 Overlay
+
+要让多台设备使用同一个只读 overlay 仓库，可由 Shine 管理其本地镜像：
+
+```bash
+shine overlay link --git https://example.com/team/shine-overlay.git --branch main
+shine pull
+shine overlay show
+```
+
+首次 `shine pull` 会在 `~/.shine/overlay/` 浅克隆仓库；以后会把该目录镜像到远端分支的最新状态。此目录是缓存，任何本地修改都会在下次拉取时丢失。请在仓库上游修改并推送，再在设备上运行 `shine pull`、`shine update --pull` 或 `shine upgrade --pull` 同步。
+
 ## 导出完整预设
 
 ```bash
@@ -45,7 +57,7 @@ shine init
 
 ## 拉取 Git 管理的来源
 
-外部预设目录或 overlay 是 Git 工作区时，可以只拉取来源，或在检查、应用配置前拉取：
+外部预设目录或手动链接的 overlay 是 Git 工作区时，可以只拉取来源，或在检查、应用配置前拉取：
 
 ```bash
 shine pull
@@ -61,7 +73,7 @@ Shine 会定位基础预设和当前 overlay 所在的 Git 仓库；两个来源
 - 当前处于分支上，而不是 detached HEAD；
 - 当前分支已经设置 upstream。
 
-实际更新使用 `git pull --ff-only`。Shine 不会自动 stash、rebase、reset 或解决分支冲突；验证失败时会在修改任何仓库前停止。Git 不在 `PATH` 中时也无法使用这些命令。
+这些来源实际使用 `git pull --ff-only`。Shine 不会自动 stash、rebase、reset 或解决分支冲突；验证失败时会在修改任何仓库前停止。上述限制不适用于 `--git` 管理的 overlay：它设计为可丢弃的远端镜像。Git 不在 `PATH` 中时也无法使用这些命令。
 
 ## 新建类别元数据
 
@@ -73,3 +85,37 @@ shine shell init
 ```
 
 已有文件时只有加上 `--force` 才会覆盖。类别格式属于预设作者接口，修改后应先使用对应的 `list`、`info` 和安装 `--dry-run` 验证。
+
+## 可选运行时的 Shell 入口
+
+`runtime` 用于选择 Shell 预设命令入口的运行时，而不是新增交互式 shell。未声明时使用原生 `.sh` 或 `.ps1` 入口；当前唯一可选值是 `bun`。请在类别的 `shine.toml` 中显式声明：
+
+```toml
+[[files]]
+source = "my-tool.ts"
+target = "my-tool"
+runtime = "bun"
+platforms = ["unix", "windows"]
+env = ["API_URL", "SERVICE_TOKEN=API_TOKEN"]
+```
+
+支持 `.ts`、`.js`、`.mts` 和 `.mjs`。安装后，Shine 会创建无扩展名的受管入口，用户仍以 `my-tool` 调用它；现有 `.sh` 和 `.ps1` 原生入口保持兼容。
+
+运行这类命令的每台设备都必须已在 `PATH` 中安装 Bun。Shine 不会安装 Bun、下载依赖或解析 `node_modules`；`runtime = "bun"` 也不能与 `needs_source = true` 组合使用。
+
+可选的 `env` 只适用于 Bun 入口。每项写成 `KEY` 或 `SOURCE=TARGET`；入口启动时会通过 `shine env run --no-workspace --with ...` 注入值，因此优先解密 `SOURCE_SECRET`，不存在时读取明文 `SOURCE`。声明 `env` 后，运行机器的 `PATH` 中还必须有 `shine`。不要在元数据中填写值或密文，只声明键名。
+
+后续支持的运行时会在本节逐项记录其支持值、文件类型、前提条件和限制。Python、Node 与 Deno 目前均不可配置为 `runtime`。
+
+## App 构建脚本运行时
+
+App 类别的 `[artifact]` 也可选择 Bun，使 `build` 与 `unbuild` 脚本跨平台运行：
+
+```toml
+[artifact]
+script = "build.ts"
+teardown = "unbuild.ts"
+runtime = "bun"
+```
+
+`runtime` 省略时为 `native`，直接执行脚本；`bun` 仅接受 `.ts`、`.js`、`.mts` 或 `.mjs`，并要求运行机器已安装 Bun。构建脚本会收到当前 Shine `[env]` 和 app 路径变量。若希望安装或升级实际改动文件后自动构建，可另外声明 `post_install`、`post_upgrade` 钩子；外部预设仍需用户设置 `allow_app_hooks = true`。

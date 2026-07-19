@@ -62,13 +62,41 @@ shine app uninstall starship --purge
 shine app build surge
 ```
 
-构建不会在 `install` 或 `upgrade` 中自动发生；失败会让命令直接失败。脚本可读取当前 `[env]` 值和 `SHINE_APP_HTTP_DIR`、`SHINE_CACHE_DIR`、`SHINE_STATE_DIR` 等路径变量，适合生成放在 `~/.shine/http/app/<APP_ID>/` 下的本地资源。完整变量说明见[任务与本地服务](./tasks-and-serve.md)。
+Shine 不会隐式运行 artifact；预设可通过生命周期钩子在安装或升级实际改动文件后调用 `app build`。手动构建失败会让命令直接失败。脚本可读取当前 `[env]` 值和 `SHINE_APP_HTTP_DIR`、`SHINE_CACHE_DIR`、`SHINE_STATE_DIR` 等路径变量，适合生成放在 `~/.shine/http/app/<APP_ID>/` 下的本地资源。完整变量说明见[任务与本地服务](./tasks-and-serve.md)。
 
-内置 `surge` app 预设会把 `local-proxies.conf` 和 `local-rules.conf` 安装到 Surge Profiles 目录。`shine app build surge` 用于按当前 overlay 中的脚本修补活动配置文件的 `[Proxy]` 与 `[Rule]` `#!include` 行。
+内置 `surge` app 预设会把 `local-proxies.conf`、`local-proxy-groups.conf` 和 `local-rules.conf` 安装到 Surge Profiles 目录。`shine app build surge` 用于按当前 overlay 中的脚本修补活动配置文件的 `[Proxy]`、`[Proxy Group]` 与 `[Rule]` `#!include` 行。
 
-## 升级后钩子
+需要撤销这项修补时运行：
 
-预设作者可以声明 `post_upgrade` 钩子。只有 `shine upgrade` 实际更新该类别至少一个文件后，钩子才会运行；未变化的类别不会触发。
+```bash
+shine app unbuild surge
+```
+
+`unbuild` 只运行预设声明的 `teardown` 脚本。卸载带有 teardown 的 app 时，Shine 也会尽力执行清理；清理失败只会警告，仍会继续安全卸载受管文件。
+
+### Clash Verge Rev
+
+内置 `clash-verge` 预设提供一个默认无效果的 `merge.yaml` 示例。要叠加自己的代理、策略组、远端 rule-provider 和前置规则，请在 overlay 的同路径 `app/clash-verge/merge.yaml` 中维护实际内容，然后先安装预设：
+
+```bash
+shine app install clash-verge
+```
+
+首次使用时，在 Clash Verge Rev 当前订阅中依次打开并保存 **Extend Config**、**Edit Rules**、**Edit Proxies**、**Edit Groups** 四个订阅级编辑器，然后运行：
+
+```bash
+shine app build clash-verge
+```
+
+Shine 只读取 `profiles.yaml` 定位这些绑定文件，不会修改订阅、创建绑定或写入远端订阅 YAML。构建写入新内容后，在 Clash Verge Rev 中重新选择一次订阅，再运行构建即可请求立即刷新 rule-provider。
+
+该 artifact 使用 Bun，运行机器必须已安装 Bun。预设的安装和升级钩子会在 `merge.yaml` 发生变化后自动再次调用构建；外部预设需要启用 `allow_app_hooks`。即时刷新还可使用 `[env]` 中的 `CLASH_CONTROLLER_URL` 和 `CLASH_CONTROLLER_TOKEN`；未配置 URL 时只跳过立即刷新，provider 仍按自身 interval 更新。控制器令牌不要写入 overlay 或文档。
+
+`shine app unbuild clash-verge` 不会清除 Clash Verge Rev 自己保存的订阅绑定；完全移除时还需在应用中手动清空上述四个编辑器。
+
+## 生命周期钩子
+
+预设作者可以声明 `post_install` 和 `post_upgrade` 钩子：前者在安装实际写入文件后运行，后者只在 `shine upgrade` 实际更新该类别至少一个文件后运行；未变化的类别不会触发。
 
 外部预设中的钩子需要在配置中显式允许：
 
@@ -76,4 +104,4 @@ shine app build surge
 allow_app_hooks = true
 ```
 
-钩子默认不显示 stdout；只有预设将 `show_output` 设为 `true` 时，成功输出才会作为提示显示。钩子失败会显示警告，但不会中断其它类别的升级。
+钩子默认不显示 stdout；只有预设将 `show_output` 设为 `true` 时，成功输出才会作为提示显示。钩子失败会显示警告，但不会中断其它类别的安装或升级。
