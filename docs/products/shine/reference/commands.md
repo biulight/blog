@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # 命令参考
 
-本页已审阅至提交 `0b9fdb5`（含未发布内容）。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
+本页已审阅至 Shine 0.39.0 的发布提交 `4b23247`。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
 
 ## 顶层命令
 
@@ -26,7 +26,7 @@ sidebar_position: 1
 | `shine export` | 导出内置预设到当前预设目录 |
 | `shine link <PATH>` | 设置外部预设目录 |
 | `shine unlink` | 移除外部预设目录设置 |
-| `shine ssh [--with <KEY[=ALIAS]>]... [--with-secret <KEY[=ALIAS]>]... [SSH_ARGS]... <HOST> [COMMAND]` | 开启带文件传输和可选环境变量转发的 SSH 会话 |
+| `shine ssh [--remote-shell <REMOTE_SHELL>] [--with <KEY[=ALIAS]>]... [--with-secret <KEY[=ALIAS]>]... [SSH_ARGS]... <HOST> [COMMAND]` | 开启带文件传输或 Windows 环境转发的 SSH 会话 |
 | `shine local <SUBCOMMAND>` | 在 `shine ssh` 远端会话内传输文件或查看连接状态 |
 | `shine task <SUBCOMMAND>` | 保存、运行和管理个人快捷命令 |
 | `shine run <NAME> [-- EXTRA_ARGS...]` | 运行已保存任务，等同于 `shine task run` |
@@ -81,10 +81,15 @@ shine completions <bash|zsh|powershell>
 shine sys list [--all]
 shine sys info <ITEM>
 shine sys status
+shine sys update [ITEM] [--verbose] [--proxy]
 shine sys init [--preset <PROFILE>] [--dry-run] [--force-profile] [--proxy]
 shine sys apply [ITEM] [--dry-run]
 shine sys uninstall <ITEM> [--dry-run]
 ```
+
+`sys update` 只检查 `sys init` 已记录的引导软件，不执行升级，也不修改 sys manifest 或
+profile。默认只显示确认有更新的项目；`--verbose` 还显示已是最新版及需要手动检查的项目，
+`--proxy` 使用预设代理执行包管理器检查。
 
 ## 终端主题
 
@@ -140,13 +145,17 @@ shine env identity show
 ## SSH 文件传输
 
 ```text
-shine ssh [--with <KEY[=ALIAS]>]... [--with-secret <KEY[=ALIAS]>]... [SSH_ARGS]... <HOST> [COMMAND]
-shine local download <REMOTE_SOURCE> [LOCAL_DESTINATION] [--force] [--dry-run]
-shine local upload <LOCAL_SOURCE> [REMOTE_DESTINATION] [--force] [--dry-run]
+shine ssh [--remote-shell <posix|windows>] [--with <KEY[=ALIAS]>]... [--with-secret <KEY[=ALIAS]>]... [SSH_ARGS]... <HOST> [COMMAND]
+shine local download <REMOTE_SOURCE> [LOCAL_DESTINATION] [--force] [--dry-run] [--scp]
+shine local upload <LOCAL_SOURCE> [REMOTE_DESTINATION] [--force] [--dry-run] [--scp]
 shine local status
 ```
 
 Shine 自己的 `--with`、`--with-secret` 必须写在 SSH 目标之前；其余参数会传给系统 `ssh`。`--with` 只读取同名明文配置，`--with-secret` 才会解密 `<KEY>_SECRET`。`shine local` 必须在这个远端 shell 中运行；目标已存在时先使用 `--dry-run` 预览，确认后再加 `--force` 覆盖文件或合并目录。
+
+`--remote-shell` 默认为 `posix`。Windows 远端必须显式使用 `--remote-shell windows`；该模式
+仅提供 PowerShell 环境注入，不建立 `shine local` 传输通道。`shine local ... --scp` 可在
+POSIX 远端传输模式下跳过默认的 rsync 选择，强制使用 scp。
 
 ## 自定义来源与程序升级
 

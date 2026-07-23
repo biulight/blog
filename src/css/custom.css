@@ -52,6 +52,29 @@ article header h1,
   letter-spacing: -0.02em;
 }
 
+@media (min-width: 997px) {
+  .built-in-presets-shell-table + table th:nth-child(2),
+  .built-in-presets-shell-table + table td:nth-child(2) {
+    min-width: 12rem;
+    width: 12rem;
+    white-space: nowrap;
+  }
+
+  .built-in-presets-app-table + table th:first-child,
+  .built-in-presets-app-table + table td:first-child {
+    min-width: 10.5rem;
+    width: 10.5rem;
+    white-space: nowrap;
+  }
+
+  .built-in-presets-system-table + table th:nth-child(2),
+  .built-in-presets-system-table + table td:nth-child(2) {
+    min-width: 10.5rem;
+    width: 10.5rem;
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 996px) {
   :root {
     --biulight-page-title-size: clamp(1.9rem, 6vw, 2.4rem);

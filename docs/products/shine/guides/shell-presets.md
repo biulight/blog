@@ -7,6 +7,8 @@ sidebar_position: 1
 
 Shell 预设把脚本安装到 Shine 的受管目录，并在 `~/.shine/bin/` 创建可直接调用的命令入口。Shine 当前支持 Bash、Zsh 和 PowerShell 的 profile 与命令目录管理；原生命令入口使用 `.sh` 或 `.ps1`，Bun 可作为另一种跨平台命令运行时。
 
+内置类别、平台限制、当前会话命令和所需环境变量见[内置预设](../reference/built-in-presets.md#shell-预设)。
+
 ## 查看与安装
 
 ```bash
@@ -56,7 +58,7 @@ shine shell uninstall proxy --purge
 | `utils` | `copyfile` | 通过 OSC52 将文件内容复制到本地剪贴板 |
 | `utils` | `shine-env-export` | 将 Shine env 值载入当前 shell |
 | `utils` | `shine-theme-sync` | 输出当前终端明暗主题的 shell `export` 语句 |
-| `agent` | `ccenv` | 为 Claude Code + DeepSeek provider 配置当前会话 |
+| `agent` | `ccenv` | 为 Claude Code 的当前会话选择 DeepSeek 或 Qwen provider；Qwen 尚未发布到稳定版 0.39.0 |
 
 某些类别按平台提供不同脚本；`shine shell list` 只显示当前平台可用的条目。
 

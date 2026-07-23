@@ -11,6 +11,8 @@ Shine 将全局运行时状态保存在 `~/.shine/`。首次需要配置时会�
 
 ```toml
 presets_dir = "~/dotfiles/shine-presets"
+presets_overlay_git = "https://example.com/team/shine-overlay.git"
+presets_overlay_git_branch = "main"
 app_default_dest_root = "~/.config"
 allow_app_hooks = true
 sync_terminal_theme = true
@@ -31,6 +33,8 @@ MY_API_TOKEN = { value = "<令牌>", description = "内部 API 的访问令牌" 
 | 字段 | 作用 |
 | --- | --- |
 | `presets_dir` | 使用完整的外部预设目录替代内置预设 |
+| `presets_overlay_git` | 由 Shine 浅克隆并镜像到 `~/.shine/overlay/` 的 Git overlay URL |
+| `presets_overlay_git_branch` | Git overlay 跟踪的分支；省略时使用远端默认分支 |
 | `app_default_dest_root` | 未声明目标路径的旧式 app 预设默认根目录 |
 | `allow_app_hooks` | 允许外部 app 预设在安装或升级后运行生命周期钩子 |
 | `sync_terminal_theme` | 控制受管 Unix shell profile 是否自动运行终端主题同步，默认为启用 |
@@ -79,7 +83,10 @@ Shine 0.40.0 停止支持。请分别改名为 `shine.config.toml` 和 `shine.en
 
 `SHINE_CONFIG_DIR` 会改变全局配置和运行时状态目录；未另行指定预设来源时，预设目录为 `$SHINE_CONFIG_DIR/presets/`。
 
-Overlay 在选定的基础预设来源上按相同相对路径覆盖文件，不替代整棵目录。
+Overlay 在选定的基础预设来源上按相同相对路径覆盖文件，不替代整棵目录。手动关联的
+`presets_overlay_dir` 与 `presets_overlay_git` 互斥；使用 `shine overlay link` 可避免同时配置。
+Git 管理的 overlay 只有在首次 `shine pull` 克隆成功后才生效，本地检出会在后续拉取时
+强制镜像到远端状态，因此不要直接修改 `~/.shine/overlay/`。
 
 ## Env 值覆盖顺序
 
@@ -160,6 +167,7 @@ recipient 时，还会维护按 mode 区分的加密缓存。
 ├── tasks.toml
 ├── bin/
 ├── http/
+├── overlay/
 ├── rendered/
 └── presets/
     ├── app/

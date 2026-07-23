@@ -7,6 +7,8 @@ sidebar_position: 3
 
 系统预设为 macOS、Ubuntu 和 Windows 提供可选择的开发环境初始化步骤。实际可用项目以当前版本的 `shine sys list` 为准。
 
+各平台 profile 的项目清单，以及 `split-dns` 所需的环境变量和安全预览步骤见[内置预设](../reference/built-in-presets.md#系统预设)。
+
 ## 先查看，再执行
 
 ```bash
@@ -46,6 +48,27 @@ winget settings --enable ProxyCommandLineOptions
 ```bash
 shine sys status
 ```
+
+## 检查引导软件更新
+
+初始化完成后，可只读检查当时记录的软件是否有可用更新：
+
+```bash
+shine sys update
+shine sys update neovim --verbose
+shine sys update --proxy
+```
+
+该命令只检查 `shine sys init` 已记录的引导软件，不安装或升级软件，也不修改 sys manifest
+或 shell profile。默认只显示包管理器确认有更新的项目和可复制的上游升级命令；
+`--verbose` 还会显示已是最新版和只能手动检查的项目。
+
+当前内置预设可通过 Homebrew、apt 和 winget 检查更新。直接安装器和用户自行维护的 Git
+配置会标记为需要手动检查，不会根据不可靠的信息猜测版本。`--proxy` 使用与
+`sys init --proxy` 相同的代理配置；Windows 上会显式传递 winget 的 `--proxy` 参数。
+
+`shine update` 和 `shine upgrade` 仍只处理 Shine 管理的配置和受管系统资源，不会升级这些
+第三方软件。是否执行 `shine sys update` 输出的升级命令始终由用户决定。
 
 ## 受管系统项目
 
