@@ -27,3 +27,4 @@ sidebar_position: 1
 - [使用 acme.sh 为 Nginx UI 管理的站点配置 HTTPS](./nginx-ui-https-certificate.md)
 - [使用 step-ca 为内网域名签发和自动续期证书](./step-ca-internal-certificate.md)
 - [在 WSL 中让 GitHub Actions self-hosted runner 随 Windows 登录启动](./wsl-github-actions-runner-autostart.md)
+- [通过 CLIProxyAPI 让 Claude Code 使用 GPT](./claude-code-cliproxyapi-codex-login.md)
