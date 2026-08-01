@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # 命令参考
 
-本页已审阅至 Shine 0.39.0 的发布提交 `4b23247`。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
+本页已审阅至 Shine 0.40.0 的发布提交 `645f8406`。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
 
 ## 顶层命令
 
@@ -47,12 +47,15 @@ shine app list
 shine app info <CATEGORY>
 shine app install [CATEGORY] [--dry-run]
 shine app reinstall [CATEGORY] [--dry-run]
+shine app refresh <CATEGORY> [FILE] [--force]
 shine app uninstall [CATEGORY] [--force] [--purge] [--dry-run]
 shine app build <APP_ID>
 shine app unbuild <APP_ID>
 ```
 
 `app uninstall --force` 会删除安装后已被修改的受管文件，使用前应先运行 `--dry-run` 并确认不再需要这些修改。
+
+`app refresh` 只处理已经安装并由 manifest 跟踪的生成式文件。省略 `FILE` 时刷新该类别的全部已安装生成式文件；指定时使用预设 `[[files]].source` 的相对路径。目标被用户修改后默认保留，只有确认要覆盖时才使用 `--force`。生成失败会保留上次成功的文件，并在尝试其余目标后返回失败。
 
 `app build` 只运行该 app 预设在 `[artifact]` 中声明的脚本；Shine 不会隐式构建，但预设可通过 `post_install` 或 `post_upgrade` 钩子显式调用它。
 `app unbuild` 运行对应的 `teardown` 脚本，反转此前构建产生的外部修改。
@@ -74,6 +77,7 @@ shine completions <bash|zsh|powershell>
 - `upgrade --pull` 先拉取 Git 来源并重新加载配置，再更新已安装配置。
 - `--prune-stale` 移除预设来源中已不存在的旧受管 app 文件。
 - `info --diff` 显式输出预期内容差异，`--verbose` 还会输出内容。
+- `list` 还会显示当前操作系统已登记的受管系统配置；详细状态使用 `sys status` 或 `sys info`。
 
 ## 系统预设
 

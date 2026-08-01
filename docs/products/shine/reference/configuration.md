@@ -69,8 +69,10 @@ DETAILED_VALUE = { value = "example", description = "供构建任务使用的示
 
 Shine 从当前目录向上查找最近的 `shine.config.toml`。项目配置是全局配置之上的稀疏覆盖层；没有声明的字段继续继承全局值，相对路径以声明它的配置文件所在目录为基准。
 
-旧式项目 `config.toml` 和 `.env.toml` 仅作为兼容方式读取，使用时会显示弃用警告，并将在
-Shine 0.40.0 停止支持。请分别改名为 `shine.config.toml` 和 `shine.env.toml`。
+Shine 0.40.0 不再识别项目中的旧式 `config.toml` 和 `.env.toml`。升级前请分别改名为
+`shine.config.toml` 和 `shine.env.toml`；普通同名文件会被忽略，不会作为 Shine 配置读取。
+
+Shine 0.40.0 也不再自动迁移旧的全局 `~/.shine/env.toml`。升级前可先运行一次 v0.39 完成迁移；已经升级时，请将旧文件移动为 `~/.shine/shine.env.toml`，若目标文件已存在则手动合并。检测到旧文件时，普通配置加载会停止并显示恢复提示，避免悄悄忽略仍在使用的值。
 
 ## 目录与来源优先级
 

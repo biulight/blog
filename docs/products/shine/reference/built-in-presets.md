@@ -16,7 +16,7 @@ shine sys list --all
 shine sys info split-dns
 ```
 
-本文依据当前源码中的内置 `presets/` 目录编写。Qwen 的 `ccenv` provider 尚未包含在稳定版 0.39.0 中；使用稳定版时请以 `shine shell list` 和 `--help` 的输出为准。
+本文依据 Shine 0.40.0 源码中的内置 `presets/` 目录编写。使用其它版本时请以 `shine shell list` 和 `--help` 的输出为准。
 
 ## Shell 预设
 
@@ -26,14 +26,14 @@ shine sys info split-dns
 
 | 类别 | 命令 | 用途与前提 |
 | --- | --- | --- |
-| `agent` | `ccenv` | 为当前会话的 Claude Code 选择 DeepSeek 或 Qwen provider。设置所选 provider 的 `*_API_KEY` 或 `*_API_KEY_GPG_SECRET` 后再运行；不会保存 token，也不会改变其它终端。Qwen 为未发布能力。 |
+| `agent` | `ccenv` | 通过 Bun 在 macOS、Linux 或 Windows 选择 Codex（默认）、DeepSeek 或 Qwen，并启动 Claude Code。provider 变量只进入该子进程；需要已安装 `bun`、`shine` 和 Claude Code。 |
 | `proxy` | `setproxy` | 为当前会话设置 HTTP/HTTPS/SOCKS5、npm 和 pnpm 代理。使用 `HTTP_PROXY_PORT`、`SOCKS5_PROXY_PORT`、`PROXY_HOST`、`PROXY_NO_PROXY`；`auto` 优先 SOCKS5。若安装了 Yarn，它会修改 Yarn 的持久代理配置。 |
 | `proxy` | `usetproxy` | 清除当前会话的代理变量，并清除 `setproxy` 写入的 Yarn 代理配置。 |
 | `utils` | `copyfile` | 通过 OSC52 把一个文件内容复制到本地剪贴板；仅 Unix，终端或终端复用器必须允许 OSC52。 |
 | `utils` | `shine-env-export` | 将一个 Shine env 值导入当前会话；可读取同名明文值，或解密 `<KEY>_SECRET`。 |
 | `utils` | `shine-theme-sync` | 输出并导入终端明暗主题对应的 `SHINE_TERMINAL_THEME` 与 `BAT_THEME`。 |
 
-`ccenv` 的 DeepSeek 凭据为 `DEEPSEEK_API_KEY` 或 `DEEPSEEK_API_KEY_GPG_SECRET`；未发布的 Qwen provider 使用对应的 `QWEN_*` 键。加密 secret 优先于明文值；解密失败时不会回退到明文。
+`ccenv` 的 Codex provider 通过本机 CLIProxyAPI 使用 `CLIPROXYAPI_AUTH_TOKEN`；DeepSeek 和 Qwen 分别使用对应的 `*_API_KEY`。凭据按 `_SECRET`、旧版 `_GPG_SECRET`、明文值的顺序解析；一旦选中的密文解密失败就会停止，不会回退。CLIProxyAPI 应只绑定回环地址，并配置与客户端相同的 token。
 
 更多安装、重装与卸载说明见[管理 Shell 预设](../guides/shell-presets.md)，环境变量格式见[管理环境变量](../guides/environment.md)。
 
@@ -52,7 +52,7 @@ shine sys info split-dns
 | `git` | `~/.gitconfig` | Git 常用别名和默认配置。安装前会按普通 app 预设规则备份不受管文件。 |
 | `JetBrains` | `~/.ideavimrc` | JetBrains 的 IdeaVim 配置；需要已在 IDE 中启用 IdeaVim 插件。 |
 | `starship` | `~/.config/starship.toml` | Starship prompt 配置；需要另行安装并在 shell 中启用 Starship。 |
-| `surge` | macOS；`~/Library/Application Support/Surge/Profiles/` | 本地代理、策略组和规则文件。需已安装 Surge；`app build`/`unbuild` 的 profile `#!include` 流程见[应用配置指南](../guides/app-presets.md#构建辅助资源)。 |
+| `surge` | macOS；`~/Library/Application Support/Surge/Profiles/` | 本地代理、策略组和规则文件，以及可选的 URI 订阅生成文件。需已安装 Surge；生成、刷新和 `app build`/`unbuild` 的 profile `#!include` 流程见[应用配置指南](../guides/app-presets.md#生成式文件与-surge-uri-订阅)。 |
 | `vim` | `~/.vim/` | Vim 基础配置和机器本地覆盖文件。 |
 
 `docker-desktop` 的 JSON 合并保留其它 Docker Desktop 设置；所有其它 app 预设只管理其各自声明的文件。安装应用预设不会下载、安装或启动 Ghostty、Docker、Surge、Starship 等应用。

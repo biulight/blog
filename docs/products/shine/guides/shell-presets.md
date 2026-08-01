@@ -58,8 +58,15 @@ shine shell uninstall proxy --purge
 | `utils` | `copyfile` | 通过 OSC52 将文件内容复制到本地剪贴板 |
 | `utils` | `shine-env-export` | 将 Shine env 值载入当前 shell |
 | `utils` | `shine-theme-sync` | 输出当前终端明暗主题的 shell `export` 语句 |
-| `agent` | `ccenv` | 为 Claude Code 的当前会话选择 DeepSeek 或 Qwen provider；Qwen 尚未发布到稳定版 0.39.0 |
+| `agent` | `ccenv` | 选择 Codex、DeepSeek 或 Qwen provider，并在隔离的子进程环境中启动 Claude Code；需要 Bun |
 
 某些类别按平台提供不同脚本；`shine shell list` 只显示当前平台可用的条目。
+
+`ccenv` 默认通过本机 `http://127.0.0.1:8317` 的 CLIProxyAPI 使用 Codex，也可交互选择 DeepSeek 或 Qwen。相应凭据使用 `CLIPROXYAPI_AUTH_TOKEN`、`DEEPSEEK_API_KEY` 或 `QWEN_API_KEY`；加密值使用同名的 `_SECRET` 后缀，旧版 `_GPG_SECRET` 仍可读取。所选 provider 的变量只传给启动的 Claude 进程，不会修改当前终端。Claude 参数会原样转发；若首个参数与 `ccenv` 的 `--run` 兼容参数冲突，先写 `--`：
+
+```bash
+ccenv --print "hello"
+ccenv -- --run
+```
 
 想用 Bun 编写跨平台命令预设？请参阅[可选运行时的 Shell 入口](./custom-presets.md#可选运行时的-shell-入口)。

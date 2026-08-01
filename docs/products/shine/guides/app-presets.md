@@ -56,6 +56,40 @@ shine app uninstall starship --purge
 
 `shine update` 比较的是变换后的最终结果，而不是原始预设文件。
 
+## 生成式文件与 Surge URI 订阅
+
+App 预设可以为 `[[files]]` 声明 generator，把命令的 UTF-8 stdout 作为该受管文件的预期内容。生成结果仍经过正常的变换、hash、manifest、用户修改保护和卸载流程，不应由脚本绕过 Shine 直接改写目标文件。
+
+生成器可分为自动和手动两类。自动生成器可参与安装、只读状态检查和升级；`auto = false` 的手动生成器不会在 `list`、`info`、`update` 或 `upgrade` 中运行，需显式刷新已经安装的生成式文件：
+
+```bash
+shine app refresh <CATEGORY>
+shine app refresh <CATEGORY> <SOURCE_FILE>
+```
+
+指定文件时，`SOURCE_FILE` 是预设 `[[files]].source` 的相对路径。刷新失败会保留上次成功内容；目标已被用户修改时也会保留，只有确认要覆盖时才添加 `--force`。安装和重新安装会运行已由 `when_env` 启用的生成器，不受 `auto` 设置影响。
+
+外部预设或 overlay 提供的 generator 属于可执行代码，需要设置 `allow_app_hooks = true`。Shine 只向它传入预设显式声明的 env 值及固定的 `SHINE_APP_*` 路径变量，并限制执行时间和输出大小；仍应只运行自己审阅和信任的预设。
+
+### Surge URI 订阅
+
+内置 `surge` 预设可把 HTTPS Base64 URI 订阅转换为受管的 `subscription-proxies.conf`。此功能需要 Bun，支持兼容的 `ss://` 和 `vmess://` 记录；VLESS、不支持的 transport、插件、坏记录与重复项会被跳过，并只输出不含凭据的摘要。用户维护的 `local-proxies.conf` 不会被改写。
+
+先配置 URL 并安装：
+
+```bash
+shine env set SURGE_SUBSCRIPTION_URL 'https://provider.example/subscription?...'
+shine app install surge
+```
+
+该生成器为手动模式，日常 `shine update` 和 `shine upgrade` 不会访问订阅。需要刷新时，先打开 provider 的访问窗口，再运行：
+
+```bash
+shine app refresh surge subscription-proxies.conf
+```
+
+刷新成功且内容变化后会通过现有 `post_upgrade` 钩子 reload Surge；失败时保留上次成功文件。`local-proxy-groups.conf` 中的 `Subscription` 组通过 `policy-path=subscription-proxies.conf` 读取节点，其它策略组可用 `include-other-group=Subscription` 纳入这些节点。
+
 ## 构建辅助资源
 
 部分 app 预设会在 `shine.toml` 的 `[artifact]` 中声明脚本。需要生成或刷新这类资源时，手动运行：
@@ -66,7 +100,7 @@ shine app build surge
 
 Shine 不会隐式运行 artifact；预设可通过生命周期钩子在安装或升级实际改动文件后调用 `app build`。手动构建失败会让命令直接失败。脚本可读取当前 `[env]` 值和 `SHINE_APP_HTTP_DIR`、`SHINE_CACHE_DIR`、`SHINE_STATE_DIR` 等路径变量，适合生成放在 `~/.shine/http/app/<APP_ID>/` 下的本地资源。完整变量说明见[任务与本地服务](./tasks-and-serve.md)。
 
-内置 `surge` app 预设会把 `local-proxies.conf`、`local-proxy-groups.conf` 和 `local-rules.conf` 安装到 Surge Profiles 目录。`shine app build surge` 用于按当前 overlay 中的脚本修补活动配置文件的 `[Proxy]`、`[Proxy Group]` 与 `[Rule]` `#!include` 行。
+内置 `surge` app 预设会把 `local-proxies.conf`、`local-proxy-groups.conf`、`local-rules.conf` 和可选的订阅生成文件安装到 Surge Profiles 目录。设置 `[env]` 中的 `SURGE_PROFILE` 后，`shine app build surge` 使用内置 Bun artifact 幂等修补活动配置文件的 `[Proxy]`、`[Proxy Group]` 与 `[Rule]` `#!include` 行。Overlay 只需覆盖自己的策略文件，无需提供构建脚本。
 
 需要撤销这项修补时运行：
 
@@ -100,7 +134,7 @@ Shine 只读取 `profiles.yaml` 定位这些绑定文件，不会修改订阅、
 
 预设作者可以声明 `post_install` 和 `post_upgrade` 钩子：前者在安装实际写入文件后运行，后者只在 `shine upgrade` 实际更新该类别至少一个文件后运行；未变化的类别不会触发。
 
-外部预设中的钩子需要在配置中显式允许：
+外部预设中的钩子和 generator 需要在配置中显式允许：
 
 ```toml
 allow_app_hooks = true

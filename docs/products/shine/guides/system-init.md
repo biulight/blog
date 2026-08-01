@@ -70,6 +70,8 @@ shine sys update --proxy
 `shine update` 和 `shine upgrade` 仍只处理 Shine 管理的配置和受管系统资源，不会升级这些
 第三方软件。是否执行 `shine sys update` 输出的升级命令始终由用户决定。
 
+顶层 `shine list` 会列出当前操作系统已登记在 sys manifest 中的受管系统配置；它用于快速总览，详细状态仍以 `shine sys status` 和 `shine sys info <ITEM>` 为准。`update --verbose` 与 `upgrade --verbose` 会同时展示跳过、已是最新以及需要注意的受管资源。
+
 ## 受管系统项目
 
 部分系统配置是可重复应用和安全移除的受管项目：
