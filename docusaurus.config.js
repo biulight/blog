@@ -9,7 +9,7 @@ const darkTheme = themes.dracula;
 const config = {
   title: 'Biulight 文档',
   tagline: '产品手册与实践指南',
-  url: 'https://blog.biulight.cn',
+  url: 'https://blog.biulight.top',
   baseUrl: '/timeline/',
   onBrokenLinks: 'throw',
   markdown: {
@@ -129,7 +129,7 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
-          { href: 'https://blog.biulight.cn/timeline/blog/rss.xml', label: 'RSS', position: 'right' },
+          { href: 'https://blog.biulight.top/timeline/blog/rss.xml', label: 'RSS', position: 'right' },
         ],
       },
       footer: {
