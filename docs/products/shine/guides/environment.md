@@ -7,12 +7,12 @@ sidebar_position: 5
 
 Shine 可以保存预设模板变量，也可以使用 GPG 封存项目环境中的敏感值。不要把真实密钥写进公开仓库或文档示例。
 
-`shine env seal`、workspace 形式的 `shine env run`、`env run --with` 以及 `age` 密钥后端均已包含在 Shine 0.37.0 中。
+密钥操作统一位于 `shine env secret` 下；workspace 形式的 `shine env run` 和 `env run --with` 用于按需向子进程注入变量。
 
 ## 查看和设置变量
 
 ```bash
-shine env show
+shine env list
 shine env get HTTP_PROXY_PORT
 shine env set HTTP_PROXY_PORT 6152
 shine env delete HTTP_PROXY_PORT
@@ -22,7 +22,7 @@ shine env delete HTTP_PROXY_PORT
 `localhost,127.0.0.1,::1`。修改它或其他代理变量后，`shine update` 会把已安装的
 `proxy` shell 预设标记为可更新；运行 `shine upgrade` 应用新值。
 
-`shine env show` 默认隐藏敏感值；`--reveal` 会显示完整值，应只在安全终端中使用。输出会按实际来源分为 `config.toml`、全局覆盖文件、overlay 和项目覆盖文件，便于确认哪个值正在生效。变量通常保存到当前配置的 `[env]` 表。
+`shine env list` 默认隐藏敏感值；`--reveal` 会显示完整值，应只在安全终端中使用。输出会按实际来源分为 `config.toml`、全局覆盖文件、overlay 和项目覆盖文件，便于确认哪个值正在生效。变量通常保存到当前配置的 `[env]` 表。
 
 全局 `~/.shine/config.toml` 和项目 `shine.config.toml` 的 `[env]` 支持简写字符串，也支持
 同时记录值和说明：
@@ -33,19 +33,19 @@ HTTP_PROXY_PORT = "6152"
 MY_API_TOKEN = { value = "<令牌>", description = "内部 API 的访问令牌" }
 ```
 
-`value` 的使用方式与简写字符串完全相同；`description` 会显示在 `shine env show` 中。
+`value` 的使用方式与简写字符串完全相同；`description` 会显示在 `shine env list` 中。
 对已有详细条目执行 `shine env set MY_API_TOKEN <新值>` 时，Shine 会更新 `value` 并保留
 说明。
 
-若同名键已由全局、overlay 或项目 `shine.env.toml` 覆盖，直接 `set`、`delete` 或 `env encrypt --set` 会被拒绝，防止写入一个不会生效的低优先级值。确认应修改该覆盖文件时，添加 `--force`：
+若同名键已由全局、overlay 或项目 `shine.env.toml` 覆盖，直接 `set`、`delete` 或 `env secret encrypt --set` 会被拒绝，防止写入一个不会生效的低优先级值。确认应修改该覆盖文件时，添加 `--force`：
 
 ```bash
 shine env set HTTP_PROXY_PORT 7890 --force
 shine env delete HTTP_PROXY_PORT --force
-shine env encrypt --from MY_TOKEN --set MY_TOKEN_SECRET --force
+shine env secret encrypt --from MY_TOKEN --set MY_TOKEN_SECRET --force
 ```
 
-对于 `shine overlay link --git` 管理的镜像，`--force` 写入会在下次 `shine pull` 时被丢弃；应改在 overlay 上游仓库维护该值。
+对于 `shine preset overlay link --git` 管理的镜像，`--force` 写入会在下次 `shine preset pull` 时被丢弃；应改在 overlay 上游仓库维护该值。
 
 不带 `[env]` 表头的全局、overlay 和项目 `shine.env.toml` 覆盖文件也支持这两种格式：
 
@@ -76,8 +76,8 @@ gpg_key_id = "user@example.com"
 将已有明文变量加密并保存为另一个 key：
 
 ```bash
-shine env encrypt --from MY_TOKEN --set MY_TOKEN_SECRET
-shine env decrypt MY_TOKEN_SECRET
+shine env secret encrypt --from MY_TOKEN --set MY_TOKEN_SECRET
+shine env secret decrypt MY_TOKEN_SECRET
 ```
 
 加密只需要接收者公钥；解密时才需要连接持有对应私钥的 YubiKey，并按提示输入 PIN 或触摸设备。
@@ -85,8 +85,8 @@ shine env decrypt MY_TOKEN_SECRET
 需要导出到当前 shell 时：
 
 ```bash
-eval "$(shine env export MY_TOKEN)"
-eval "$(shine env export MY_TOKEN --as API_TOKEN)"
+eval "$(shine env secret export MY_TOKEN)"
+eval "$(shine env secret export MY_TOKEN --as API_TOKEN)"
 ```
 
 安装 `utils` shell 预设后，也可以使用 `shine-env-export MY_TOKEN --as API_TOKEN`。
@@ -104,9 +104,9 @@ brew install age age-plugin-se
 生成身份并记录输出中的 recipient：
 
 ```bash
-shine env identity init
-shine env identity init --touch-id
-shine env identity show
+shine env secret identity init
+shine env secret identity init --touch-id
+shine env secret identity list
 ```
 
 `--touch-id` 只适用于 macOS；解密时会触发系统 Touch ID 提示。普通身份使用 `age-keygen`，默认写入 `~/.shine/age/identity.txt`。
@@ -122,8 +122,8 @@ age_identity = "~/.shine/age/identity.txt"
 也可以只在单次命令中选择后端和 recipient：
 
 ```bash
-shine env encrypt --backend age -r age1se1qexample... -r age1qteammate... --from MY_TOKEN
-shine env seal --backend age -r age1se1qexample... -r age1qteammate...
+shine env secret encrypt --backend age -r age1se1qexample... -r age1qteammate... --from MY_TOKEN
+shine env secret seal --backend age -r age1se1qexample... -r age1qteammate...
 ```
 
 `-r/--recipient` 对 GPG 和 age 都可以重复使用。移除某个 recipient 不会撤销它对历史密文的访问；需要重新加密或重新 `seal` 才能轮换访问范围。
@@ -197,11 +197,11 @@ data = "<由 Shine 管理的 GPG 密文>"
 封存待处理的 secret，再用合并后的环境启动命令：
 
 ```bash
-shine env seal
+shine env secret seal
 shine env run --mode production -- bun run build
 ```
 
-`seal` 默认处理 workspace 引用的环境文件。可用 `shine env seal <FILE>` 只处理一个文件，
+`seal` 默认处理 workspace 引用的环境文件。可用 `shine env secret seal <FILE>` 只处理一个文件，
 或通过 `--workspace <FILE>` 指定其他 workspace；`-r/--recipient` 可临时覆盖接收者。
 
 默认情况下，当前进程已经存在的环境变量优先于 workspace。设置

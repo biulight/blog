@@ -13,14 +13,16 @@ sidebar_position: 3
 shine shell list
 shine app list
 shine sys list
+shine list --available
 ```
 
-三个入口分别列出 shell 命令、应用配置和当前操作系统的初始化项目。
+前三个入口分别列出 shell 命令、应用配置和当前操作系统的初始化项目；`list --available` 使用 1.0 的统一目录展示三类资源，也可追加 `app`、`shell` 或 `sys` 过滤。
 
 ## 2. 安装代理命令
 
 ```bash
 shine shell install proxy
+# 等价的规范 target 写法：shine install shell/proxy
 ```
 
 Shine 会把脚本放到 `~/.shine/presets/shell/`，在 `~/.shine/bin/` 创建命令入口，并将该目录加入支持的 shell profile。
@@ -39,10 +41,10 @@ PowerShell 用户可重新打开终端，确保更新后的 profile 生效。
 ```bash
 setproxy
 shine list
-shine info proxy
+shine info shell/proxy
 ```
 
-`shine list` 只显示当前已安装且可用的内容；`shine info` 会显示目标状态和必要的差异信息。
+`shine list` 显示当前已安装且可用的内容；`shine info` 也能检查尚未安装的预设。脚本中优先使用 `shell/proxy` 这类完整 target，裸名称只在 app 与 shell 之间唯一时才可使用。
 
 取消当前终端会话中的代理：
 
@@ -59,4 +61,3 @@ shine shell uninstall proxy --dry-run
 确认输出后去掉 `--dry-run` 即可执行。Shine 只移除自身管理的脚本、命令入口和相关 profile 片段。
 
 接下来可以安装[应用配置](./guides/app-presets.md)，或使用[系统初始化预设](./guides/system-init.md)。
-

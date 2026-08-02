@@ -71,8 +71,8 @@ env | rg '^(HTTP_PROXY|HTTPS_PROXY|NO_PROXY|http_proxy|https_proxy|no_proxy)='
 先查看当前配置：
 
 ```bash
-shine env show
-shine info proxy
+shine env list
+shine info shell/proxy
 ```
 
 然后把默认值和私有网络需要的排除项一起写进去。下面示例全部使用占位值：
@@ -91,8 +91,8 @@ shine env set PROXY_NO_PROXY \
 修改后不要只停留在 `env set`。Shine 会先把已安装的 `proxy` 预设标记为可更新，还需要执行：
 
 ```bash
-shine update
-shine upgrade
+shine update shell/proxy
+shine upgrade shell/proxy
 ```
 
 如果你不是用 Shine 管理终端代理，本质上也一样：最终要确认当前 shell 里的 `NO_PROXY` / `no_proxy` 已经包含这些私有目标。
@@ -102,7 +102,7 @@ shine upgrade
 先确认当前 shell 中的代理变量已经变成预期值：
 
 ```bash
-shine info proxy
+shine info shell/proxy
 env | rg '^(HTTP_PROXY|HTTPS_PROXY|NO_PROXY|http_proxy|https_proxy|no_proxy)='
 ```
 

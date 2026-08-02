@@ -38,7 +38,7 @@ MY_API_TOKEN = { value = "<令牌>", description = "内部 API 的访问令牌" 
 | `app_default_dest_root` | 未声明目标路径的旧式 app 预设默认根目录 |
 | `allow_app_hooks` | 允许外部 app 预设在安装或升级后运行生命周期钩子 |
 | `sync_terminal_theme` | 控制受管 Unix shell profile 是否自动运行终端主题同步，默认为启用 |
-| `gpg_key_id` | `shine env encrypt` 默认 GPG recipient |
+| `gpg_key_id` | `shine env secret encrypt` 默认 GPG recipient |
 | `secret_backend` | 默认密钥后端，省略时为 `gpg` |
 | `age_recipients` | `age` 后端默认加密接收者列表 |
 | `age_identity` | 解密 `age:` 密文时使用的身份文件路径，省略时可使用 `~/.shine/age/identity.txt` |
@@ -56,9 +56,9 @@ DETAILED_VALUE = { value = "example", description = "供构建任务使用的示
 ```
 
 - 字符串适合不需要补充说明的变量。
-- 详细格式中的 `value` 参与 `env get`、模板替换、`env encrypt`、`env export` 和
+- 详细格式中的 `value` 参与 `env get`、模板替换、`env secret encrypt`、`env secret export` 和
   `env run --with`，行为与字符串格式相同。
-- `description` 只用于 `shine env show` 的可读说明，不会传入子进程或模板。
+- `description` 只用于 `shine env list` 的可读说明，不会传入子进程或模板。
 - 当前配置中的内联 `description` 优先于预设 `<presets>/env.toml` catalog 的同名说明。
 - `shine env set` 更新已有详细条目时会保留其 `description`。
 - 覆盖文件中的详细项同时覆盖值和说明；字符串只覆盖值，并保留从低优先级配置或 preset
@@ -86,8 +86,8 @@ Shine 0.40.0 也不再自动迁移旧的全局 `~/.shine/env.toml`。升级前�
 `SHINE_CONFIG_DIR` 会改变全局配置和运行时状态目录；未另行指定预设来源时，预设目录为 `$SHINE_CONFIG_DIR/presets/`。
 
 Overlay 在选定的基础预设来源上按相同相对路径覆盖文件，不替代整棵目录。手动关联的
-`presets_overlay_dir` 与 `presets_overlay_git` 互斥；使用 `shine overlay link` 可避免同时配置。
-Git 管理的 overlay 只有在首次 `shine pull` 克隆成功后才生效，本地检出会在后续拉取时
+`presets_overlay_dir` 与 `presets_overlay_git` 互斥；使用 `shine preset overlay link` 可避免同时配置。
+Git 管理的 overlay 只有在首次 `shine preset pull` 克隆成功后才生效，本地检出会在后续拉取时
 强制镜像到远端状态，因此不要直接修改 `~/.shine/overlay/`。
 
 ## Env 值覆盖顺序
@@ -152,7 +152,7 @@ PLAINTEXT_TO_SEAL = "<待封存的值>"
 data = "<由 Shine 管理的 GPG 密文>"
 ```
 
-`shine env seal` 会把 `[secret]` 中的待处理值合并进加密 payload，并将已封存项改为
+`shine env secret seal` 会把 `[secret]` 中的待处理值合并进加密 payload，并将已封存项改为
 `true`。`shine env run` 按文件顺序合并 `[plain]` 和解密后的 secret；配置了可用的 GPG
 recipient 时，还会维护按 mode 区分的加密缓存。
 

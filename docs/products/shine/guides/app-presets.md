@@ -23,7 +23,7 @@ shine app install starship --dry-run
 
 ```bash
 shine app install starship
-shine install starship
+shine install app/starship
 shine update
 shine upgrade
 ```
@@ -33,7 +33,7 @@ shine upgrade
 如果只需覆盖一个类别的受管文件：
 
 ```bash
-shine app reinstall starship
+shine app install starship --replace-managed
 ```
 
 ## 卸载与恢复
@@ -67,7 +67,7 @@ shine app refresh <CATEGORY>
 shine app refresh <CATEGORY> <SOURCE_FILE>
 ```
 
-指定文件时，`SOURCE_FILE` 是预设 `[[files]].source` 的相对路径。刷新失败会保留上次成功内容；目标已被用户修改时也会保留，只有确认要覆盖时才添加 `--force`。安装和重新安装会运行已由 `when_env` 启用的生成器，不受 `auto` 设置影响。
+指定文件时，`SOURCE_FILE` 是预设 `[[files]].source` 的相对路径。刷新失败会保留上次成功内容；目标已被用户修改时也会保留，只有确认要覆盖时才添加 `--force`。安装和带 `--replace-managed` 的修复安装会运行已由 `when_env` 启用的生成器，不受 `auto` 设置影响。
 
 外部预设或 overlay 提供的 generator 属于可执行代码，需要设置 `allow_app_hooks = true`。Shine 只向它传入预设显式声明的 env 值及固定的 `SHINE_APP_*` 路径变量，并限制执行时间和输出大小；仍应只运行自己审阅和信任的预设。
 
@@ -95,24 +95,26 @@ shine app refresh surge subscription-proxies.conf
 部分 app 预设会在 `shine.toml` 的 `[artifact]` 中声明脚本。需要生成或刷新这类资源时，手动运行：
 
 ```bash
-shine app build surge
+shine app artifact apply surge
 ```
 
-Shine 不会隐式运行 artifact；预设可通过生命周期钩子在安装或升级实际改动文件后调用 `app build`。手动构建失败会让命令直接失败。脚本可读取当前 `[env]` 值和 `SHINE_APP_HTTP_DIR`、`SHINE_CACHE_DIR`、`SHINE_STATE_DIR` 等路径变量，适合生成放在 `~/.shine/http/app/<APP_ID>/` 下的本地资源。完整变量说明见[任务与本地服务](./tasks-and-serve.md)。
+Shine 不会隐式运行 artifact；预设可通过生命周期钩子在安装或升级实际改动文件后调用 `app artifact apply`。手动应用失败会让命令直接失败。脚本可读取当前 `[env]` 值和 `SHINE_APP_HTTP_DIR`、`SHINE_CACHE_DIR`、`SHINE_STATE_DIR` 等路径变量，适合生成放在 `~/.shine/http/app/<APP_ID>/` 下的本地资源。完整变量说明见[任务与本地服务](./tasks-and-serve.md)。
 
-内置 `surge` app 预设会把 `local-proxies.conf`、`local-proxy-groups.conf`、`local-rules.conf` 和可选的订阅生成文件安装到 Surge Profiles 目录。设置 `[env]` 中的 `SURGE_PROFILE` 后，`shine app build surge` 使用内置 Bun artifact 幂等修补活动配置文件的 `[Proxy]`、`[Proxy Group]` 与 `[Rule]` `#!include` 行。Overlay 只需覆盖自己的策略文件，无需提供构建脚本。
+内置 `surge` app 预设会把 `local-proxies.conf`、`local-proxy-groups.conf`、`local-rules.conf` 和可选的订阅生成文件安装到 Surge Profiles 目录。设置 `[env]` 中的 `SURGE_PROFILE` 后，`shine app artifact apply surge` 使用内置 Bun artifact 幂等修补活动配置文件的 `[Proxy]`、`[Proxy Group]` 与 `[Rule]` `#!include` 行。Overlay 只需覆盖自己的策略文件，无需提供构建脚本。
+
+预设还安装默认注释、不立即生效的 `LAN Network`、`LAN PROXY` 和 `Other Direct` 规则示例。每类规则在 `local-rules.conf` 中提供三种互斥来源：随 Profile 安装的相对 `rules/*.list`、同设备 loopback HTTP 地址，或自行替换域名的远程 HTTPS 地址。每类只启用一种；相对文件通常最简单。`localhost` 始终指运行 Surge 的设备，在 iOS 上不会指向另一台局域网主机。
 
 需要撤销这项修补时运行：
 
 ```bash
-shine app unbuild surge
+shine app artifact remove surge
 ```
 
-`unbuild` 只运行预设声明的 `teardown` 脚本。卸载带有 teardown 的 app 时，Shine 也会尽力执行清理；清理失败只会警告，仍会继续安全卸载受管文件。
+`artifact remove` 只运行预设声明的 `teardown` 脚本。卸载带有 teardown 的 app 时，Shine 也会尽力执行清理；清理失败只会警告，仍会继续安全卸载受管文件。
 
 ### Clash Verge Rev
 
-内置 `clash-verge` 预设提供一个默认无效果的 `merge.yaml` 示例。要叠加自己的代理、策略组、远端 rule-provider 和前置规则，请在 overlay 的同路径 `app/clash-verge/merge.yaml` 中维护实际内容，然后先安装预设：
+内置 `clash-verge` 预设提供一个默认无效果的 `merge.yaml` 示例。要叠加自己的代理、策略组、rule-provider 和前置规则，请在 overlay 的同路径 `app/clash-verge/merge.yaml` 中维护实际内容，然后先安装预设：
 
 ```bash
 shine app install clash-verge
@@ -121,14 +123,16 @@ shine app install clash-verge
 首次使用时，在 Clash Verge Rev 当前订阅中依次打开并保存 **Extend Config**、**Edit Rules**、**Edit Proxies**、**Edit Groups** 四个订阅级编辑器，然后运行：
 
 ```bash
-shine app build clash-verge
+shine app artifact apply clash-verge
 ```
 
 Shine 只读取 `profiles.yaml` 定位这些绑定文件，不会修改订阅、创建绑定或写入远端订阅 YAML。构建写入新内容后，在 Clash Verge Rev 中重新选择一次订阅，再运行构建即可请求立即刷新 rule-provider。
 
+示例沿用上述三类流量，并为 rule-provider 提供三套互斥布局：mihomo `HomeDir` 内的 `type: file`、同设备的 loopback HTTP 服务，或远程 HTTPS 服务。选择一整套 provider 后，还需同步启用对应策略组与 `prepend-rules`。mihomo 默认限制 file provider 路径，Shine 不会把规则偷偷复制进 Clash Verge Rev 的私有目录；loopback 或私有服务的 `proxy: DIRECT` 只控制 provider 下载，如服务器只能经代理访问，应删除或调整它。私有域名依赖系统 split DNS 时，还需配置 mihomo 自己的 `dns.nameserver-policy`。
+
 该 artifact 使用 Bun，运行机器必须已安装 Bun。预设的安装和升级钩子会在 `merge.yaml` 发生变化后自动再次调用构建；外部预设需要启用 `allow_app_hooks`。即时刷新还可使用 `[env]` 中的 `CLASH_CONTROLLER_URL` 和 `CLASH_CONTROLLER_TOKEN`；未配置 URL 时只跳过立即刷新，provider 仍按自身 interval 更新。控制器令牌不要写入 overlay 或文档。
 
-`shine app unbuild clash-verge` 不会清除 Clash Verge Rev 自己保存的订阅绑定；完全移除时还需在应用中手动清空上述四个编辑器。
+`shine app artifact remove clash-verge` 不会清除 Clash Verge Rev 自己保存的订阅绑定；完全移除时还需在应用中手动清空上述四个编辑器。
 
 ## 生命周期钩子
 

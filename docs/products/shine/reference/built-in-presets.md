@@ -16,7 +16,7 @@ shine sys list --all
 shine sys info split-dns
 ```
 
-本文依据 Shine 0.40.0 源码中的内置 `presets/` 目录编写。使用其它版本时请以 `shine shell list` 和 `--help` 的输出为准。
+本文依据 Shine 1.0.0 源码中的内置 `presets/` 目录编写。使用其它版本时请以 `shine list --available` 和 `--help` 的输出为准。
 
 ## Shell 预设
 
@@ -52,14 +52,14 @@ shine sys info split-dns
 | `git` | `~/.gitconfig` | Git 常用别名和默认配置。安装前会按普通 app 预设规则备份不受管文件。 |
 | `JetBrains` | `~/.ideavimrc` | JetBrains 的 IdeaVim 配置；需要已在 IDE 中启用 IdeaVim 插件。 |
 | `starship` | `~/.config/starship.toml` | Starship prompt 配置；需要另行安装并在 shell 中启用 Starship。 |
-| `surge` | macOS；`~/Library/Application Support/Surge/Profiles/` | 本地代理、策略组和规则文件，以及可选的 URI 订阅生成文件。需已安装 Surge；生成、刷新和 `app build`/`unbuild` 的 profile `#!include` 流程见[应用配置指南](../guides/app-presets.md#生成式文件与-surge-uri-订阅)。 |
+| `surge` | macOS；`~/Library/Application Support/Surge/Profiles/` | 本地代理、策略组和规则文件，以及可选的 URI 订阅生成文件。需已安装 Surge；生成、刷新和 `app artifact apply/remove` 的 profile `#!include` 流程见[应用配置指南](../guides/app-presets.md#生成式文件与-surge-uri-订阅)。 |
 | `vim` | `~/.vim/` | Vim 基础配置和机器本地覆盖文件。 |
 
 `docker-desktop` 的 JSON 合并保留其它 Docker Desktop 设置；所有其它 app 预设只管理其各自声明的文件。安装应用预设不会下载、安装或启动 Ghostty、Docker、Surge、Starship 等应用。
 
 ## 系统预设
 
-系统预设通过 `shine sys init` 安装开发环境项目。交互模式可逐项选择；非交互模式使用该平台的默认 profile。先运行 `shine sys init --dry-run`，因为包管理器、网络下载或 profile 合并可能需要权限或改变本机环境。
+系统预设通过 `shine sys bootstrap` 安装开发环境项目。交互模式可逐项选择；非交互模式使用该平台的默认 profile。先运行 `shine sys bootstrap --dry-run`，因为包管理器、网络下载或 profile 合并可能需要权限或改变本机环境。
 
 <div className="built-in-presets-system-table" aria-hidden="true" />
 

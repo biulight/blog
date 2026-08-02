@@ -7,14 +7,14 @@ sidebar_position: 7
 
 Claude Code、Codex 等 AI Agent 参与开发后，密钥安全不再只是“不要提交 `.env`”这么简单。Agent 可能能读取工作区文件、运行命令、查看命令输出；如果把长期有效的明文 secret 放在项目里，它们很容易被复制到日志、补丁、上下文或远端服务中。
 
-Shine 的 `env seal`、`env run` 和 `age` 后端用于降低这种扩散风险：把仓库中的 secret 保存为密文，只在需要运行命令时解密并注入子进程。但它们不是沙箱，也不能替代系统权限隔离。使用前应先明确密钥身份文件、硬件授权和 Agent 权限之间的边界。
+Shine 的 `env secret seal`、`env run` 和 `age` 后端用于降低这种扩散风险：把仓库中的 secret 保存为密文，只在需要运行命令时解密并注入子进程。但它们不是沙箱，也不能替代系统权限隔离。使用前应先明确密钥身份文件、硬件授权和 Agent 权限之间的边界。
 
 ## Shine env 保护什么
 
-`shine env seal` 把 workspace 环境文件中的待处理 secret 封存到加密 payload 中。封存后，团队仓库里保留的是密文，不再是明文 token、密码或 API key。
+`shine env secret seal` 把 workspace 环境文件中的待处理 secret 封存到加密 payload 中。封存后，团队仓库里保留的是密文，不再是明文 token、密码或 API key。
 
 ```bash
-shine env seal
+shine env secret seal
 ```
 
 `shine env run` 在启动目标命令前合并环境文件、解密 secret，并只把结果提供给这个子进程：
@@ -44,8 +44,8 @@ age_identity = "~/.shine/age/identity.txt"
 `~/.shine/age/identity.txt` 则是解密 identity，等同于私钥身份，不能提交、不能共享，也不应放进 Agent 可随意读取的工作区。
 
 ```bash
-shine env identity init
-shine env identity show
+shine env secret identity init
+shine env secret identity list
 ```
 
 Shine 在 Unix/macOS 上会把自己生成的 identity 文件权限设置为 `0600`，也就是仅当前用户可读写。这可以避免其他本机用户直接读取 identity 文件。
@@ -57,7 +57,7 @@ Shine 在 Unix/macOS 上会把自己生成的 identity 文件权限设置为 `06
 macOS 上可以生成 Secure Enclave / Touch ID identity：
 
 ```bash
-shine env identity init --touch-id
+shine env secret identity init --touch-id
 ```
 
 这种身份由 `age-plugin-se` 生成。解密时需要本机 Secure Enclave，并触发 Touch ID 或系统 PIN 授权。即使 identity 文件被复制到另一台机器，通常也不能直接解密。
@@ -75,8 +75,8 @@ shine env identity init --touch-id
 Windows 成员可以使用普通 age identity 参与多 recipient 协作：
 
 ```bash
-shine env identity init
-shine env identity show
+shine env secret identity init
+shine env secret identity list
 ```
 
 把输出中的 `age1...` recipient 加入 `age_recipients` 后，同一份密文可以同时加密给 macOS Touch ID recipient 和 Windows 普通 age recipient。
@@ -109,7 +109,7 @@ Windows 笔记本的指纹、Windows Hello、TPM 理论上可以通过 age plugi
 如果 identity 文件泄露、设备不再可信，或成员离开团队，仅从 `age_recipients` 删除 recipient 不会撤销它对历史密文的访问。需要重新封存或重新加密，并在必要时轮换上游服务中的真实 token。
 
 ```bash
-shine env seal
+shine env secret seal
 ```
 
 不要提交含有尚未封存字符串的环境文件。个人覆盖文件应加入 `.gitignore`，团队共享文件中只保留已封存的密文。

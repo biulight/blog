@@ -56,8 +56,8 @@ env | rg '^(HTTP_PROXY|HTTPS_PROXY|NO_PROXY|http_proxy|https_proxy|no_proxy)='
 如果你使用 Shine 的 `proxy` shell 预设，再执行：
 
 ```bash
-shine env show
-shine info proxy
+shine env list
+shine info shell/proxy
 ```
 
 现有手册中，`PROXY_NO_PROXY` 控制 `NO_PROXY` 和 `no_proxy`，默认值为：
@@ -90,8 +90,8 @@ shine env set PROXY_NO_PROXY \
 仅执行 `shine env set` 还不够。修改 `PROXY_NO_PROXY` 后，需要让 Shine 重新生成并应用已安装的 `proxy` 预设：
 
 ```bash
-shine update
-shine upgrade
+shine update shell/proxy
+shine upgrade shell/proxy
 ```
 
 若当前终端没有自动拿到新值，重新打开一个终端，或按你的 shell 方式重新加载 profile。
@@ -107,7 +107,7 @@ shine upgrade
 修改后，先再次检查当前环境：
 
 ```bash
-shine info proxy
+shine info shell/proxy
 env | rg '^(HTTP_PROXY|HTTPS_PROXY|NO_PROXY|http_proxy|https_proxy|no_proxy)='
 ```
 
@@ -130,8 +130,8 @@ curl http://192.168.0.10:8080
 
 ```bash
 shine --version
-shine env show
-shine info proxy
+shine env list
+shine info shell/proxy
 env | rg '^(HTTP_PROXY|HTTPS_PROXY|NO_PROXY|http_proxy|https_proxy|no_proxy)='
 ```
 

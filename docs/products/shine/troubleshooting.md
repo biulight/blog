@@ -23,7 +23,7 @@ shine list
 shine info proxy
 ```
 
-如果源脚本存在但命令入口缺失，`shine list` 不会把它显示为可用。可使用 `shine shell reinstall <CATEGORY>` 重建受管文件和入口。
+如果源脚本存在但命令入口缺失，`shine list` 不会把它显示为可用。可使用 `shine shell install <CATEGORY> --replace-managed` 重建受管文件和入口。
 
 ## 应用配置显示为用户修改
 
@@ -33,7 +33,7 @@ Shine 默认保留安装后被修改过的文件。先查看差异：
 shine info app/starship --diff
 ```
 
-需要采用预设版本时运行 `shine app reinstall starship`。卸载时，只有明确要删除这些本地修改才使用 `shine app uninstall starship --force`；先运行相同命令并加上 `--dry-run`。
+需要采用预设版本时运行 `shine app install starship --replace-managed`。卸载时，只有明确要删除这些本地修改才使用 `shine app uninstall starship --force`；先运行相同命令并加上 `--dry-run`。
 
 ## 使用的不是预期预设
 
@@ -73,15 +73,15 @@ shine upgrade --verbose
 
 ```bash
 shine app info surge
-shine env show
+shine env list
 shine app refresh surge subscription-proxies.conf
 ```
 
 内置 Surge generator 要求 `SURGE_SUBSCRIPTION_URL` 使用 HTTPS，运行时还需要 Bun。失败不会删除上次成功生成的文件。若提示目标被用户修改，先检查差异；只有确定要以新生成内容覆盖时才使用 `--force`。日常 `shine update` 和 `shine upgrade` 不会访问这个手动订阅 generator。
 
-## `shine pull` 拒绝更新来源
+## `shine preset pull` 拒绝更新来源
 
-`shine pull` 只对干净、已设置 upstream 的普通分支执行快进更新。先进入错误信息显示的仓库并检查：
+`shine preset pull` 只对干净、已设置 upstream 的普通分支执行快进更新。先进入错误信息显示的仓库并检查：
 
 ```bash
 git status
@@ -90,19 +90,19 @@ git branch -vv
 git pull --ff-only
 ```
 
-请自行提交、stash 或处理本地改动和分支分歧，再重新运行 `shine pull`。Shine 不会自动丢弃改动或解决冲突。若提示找不到 Git，请先安装 Git 并确认 `git` 在 `PATH` 中；非 Git 预设目录被跳过属于正常行为。
+请自行提交、stash 或处理本地改动和分支分歧，再重新运行 `shine preset pull`。Shine 不会自动丢弃改动或解决冲突。若提示找不到 Git，请先安装 Git 并确认 `git` 在 `PATH` 中；非 Git 预设目录被跳过属于正常行为。
 
 ## 系统初始化前想确认影响
 
 ```bash
 shine sys info <ITEM>
-shine sys init --dry-run
+shine sys bootstrap --dry-run
 shine sys uninstall <ITEM> --dry-run
 ```
 
 不要依赖计划文档推断可用项目；以当前版本 `shine sys list` 和 `shine sys info` 为准。
 
-Windows 或其它工具改写过的 PowerShell、bash 或 zsh profile 可能使用 CRLF 换行。Shine 0.38.0 起的系统 profile 合并会按内容匹配受管区块，不会仅因 CRLF/LF 差异反复重写文件。若旧版本已留下冲突标记，先手工处理冲突，再重新运行 `shine sys init --dry-run` 或对应 `upgrade`。
+Windows 或其它工具改写过的 PowerShell、bash 或 zsh profile 可能使用 CRLF 换行。系统 profile 合并会按内容匹配受管区块，不会仅因 CRLF/LF 差异反复重写文件。若旧版本已留下冲突标记，先手工处理冲突，再重新运行 `shine sys bootstrap --dry-run` 或对应 `upgrade`。
 
 ## 本地 HTTP 服务无法访问资源
 
@@ -113,7 +113,7 @@ shine serve status
 shine serve url app/surge/custom-rules.sgmodule
 ```
 
-`shine serve install` 当前只支持 macOS 用户服务；其它环境可用 `shine serve start` 在前台运行。服务只发布 `~/.shine/http/` 下的文件，资源不存在时应先运行对应的 `shine app build <APP_ID>`。
+`shine serve install` 当前只支持 macOS 用户服务；其它环境可用 `shine serve start` 在前台运行。服务只发布 `~/.shine/http/` 下的文件，资源不存在时应先运行对应的 `shine app artifact apply <APP_ID>`。
 
 请不要把敏感文件放入 `~/.shine/http/`。服务绑定在 `127.0.0.1`，但没有额外认证。
 
@@ -157,5 +157,5 @@ shine local upload ./local.log /tmp/local.log --dry-run
 网络或 GitHub API 不可用时，Shine 会跳过版本检查并继续执行原命令。恢复网络后可绕过 24 小时缓存重新检查：
 
 ```bash
-shine update --refresh
+shine update --refresh-release
 ```

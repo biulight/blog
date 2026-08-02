@@ -12,9 +12,9 @@ sidebar_position: 4
 Overlay 按相同相对路径覆盖基础预设，也可以增加新类别：
 
 ```bash
-shine overlay link ~/dotfiles/shine-overlay --create
-shine overlay show
-shine overlay unlink
+shine preset overlay link ~/dotfiles/shine-overlay --create
+shine preset overlay info
+shine preset overlay unlink
 ```
 
 例如 `app/starship/starship.toml` 会覆盖基础来源中的同路径文件，其它预设继续沿用基础来源。
@@ -24,18 +24,27 @@ shine overlay unlink
 要让多台设备使用同一个只读 overlay 仓库，可由 Shine 管理其本地镜像：
 
 ```bash
-shine overlay link --git https://example.com/team/shine-overlay.git --branch main
-shine pull
-shine overlay show
+shine preset overlay link --git https://example.com/team/shine-overlay.git --branch main
+shine preset pull
+shine preset overlay info
 ```
 
-首次 `shine pull` 会在 `~/.shine/overlay/` 浅克隆仓库；以后会把该目录镜像到远端分支的最新状态。此目录是缓存，任何本地修改都会在下次拉取时丢失。请在仓库上游修改并推送，再在设备上运行 `shine pull`、`shine update --pull` 或 `shine upgrade --pull` 同步。
+首次 `shine preset pull` 会在 `~/.shine/overlay/` 浅克隆仓库；以后会把该目录镜像到远端分支的最新状态。此目录是缓存，任何本地修改都会在下次拉取时丢失。请在仓库上游修改并推送，再在设备上运行 `shine preset pull`、`shine update --pull` 或 `shine upgrade --pull` 同步。
+
+如果只想定制一个内置类别，可在 overlay 根目录复制该预设，无需导出整套内容：
+
+```bash
+cd ~/dotfiles/shine-overlay
+shine preset copy app/starship
+```
+
+命令按 `app/<name>`、`shell/<name>` 或 `sys/<name>` 复制完整类别；已有文件时只有加 `--force` 才会覆盖。
 
 ## 导出完整预设
 
 ```bash
-shine link ~/dotfiles/shine-presets --create
-shine export
+shine preset link ~/dotfiles/shine-presets --create
+shine preset export
 ```
 
 配置外部目录后，`install`、`list` 和 `update` 都从该目录读取。命令输出会显示当前激活的预设来源。
@@ -43,7 +52,7 @@ shine export
 也可以直接设置环境变量：
 
 ```bash
-SHINE_PRESETS=~/dotfiles/shine-presets shine export
+SHINE_PRESETS=~/dotfiles/shine-presets shine preset export
 ```
 
 ## 建立可提交的预设仓库
@@ -60,7 +69,7 @@ shine init
 外部预设目录或手动链接的 overlay 是 Git 工作区时，可以只拉取来源，或在检查、应用配置前拉取：
 
 ```bash
-shine pull
+shine preset pull
 shine update --pull
 shine upgrade --pull
 ```
@@ -80,8 +89,8 @@ Shine 会定位基础预设和当前 overlay 所在的 Git 仓库；两个来源
 在 app 或 shell 类别目录中生成 `shine.toml` 模板：
 
 ```bash
-shine app init
-shine shell init
+shine preset new app
+shine preset new shell
 ```
 
 已有文件时只有加上 `--force` 才会覆盖。类别格式属于预设作者接口，修改后应先使用对应的 `list`、`info` 和安装 `--dry-run` 验证。

@@ -29,16 +29,16 @@ shine install proxy
 shine completions install
 ```
 
-## 重新安装
+## 修复安装
 
 当受管脚本、命令入口或 PATH 片段需要按当前预设重建时：
 
 ```bash
-shine shell reinstall proxy
-shine reinstall proxy
+shine shell install proxy --replace-managed
+shine install shell/proxy --replace-managed
 ```
 
-重新安装会覆盖 Shine 管理的对应内容。先用 `shine info proxy` 检查状态，避免把有意的本地修改当作损坏处理。
+`--replace-managed` 会覆盖 Shine 管理的对应内容。先用 `shine info shell/proxy --diff` 检查状态，避免把有意的本地修改当作损坏处理。
 
 ## 卸载
 

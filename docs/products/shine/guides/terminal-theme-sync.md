@@ -20,7 +20,7 @@ Shine 依次使用已有的 `SHINE_TERMINAL_THEME`、终端提供的 `COLORFGBG`
 
 ## 在受管 profile 中自动同步
 
-运行 `shine sys init` 后，macOS 和 Ubuntu 的受管 profile 会自动调用同步。可通过任一种方式关闭：
+运行 `shine sys bootstrap` 后，macOS 和 Ubuntu 的受管 profile 会自动调用同步。可通过任一种方式关闭：
 
 ```toml title="~/.shine/config.toml"
 sync_terminal_theme = false
@@ -42,4 +42,3 @@ eval "$(shine-theme-sync)"
 ## SSH 会话
 
 `shine ssh <HOST>` 会在本机连接前读取当前终端主题，并将结果注入远端会话。因此远端无需能响应 OSC 11 查询，且 `bat` 等工具可与本机终端保持一致。
-

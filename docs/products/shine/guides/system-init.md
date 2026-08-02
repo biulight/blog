@@ -15,7 +15,7 @@ sidebar_position: 3
 shine sys list
 shine sys list --all
 shine sys info split-dns
-shine sys init --dry-run
+shine sys bootstrap --dry-run
 ```
 
 `--dry-run` 会显示选择结果、脚本调用和受管 profile 更新，但不执行变更。某些初始化项目需要管理员权限或额外环境变量，`shine sys info <ITEM>` 会列出要求。
@@ -23,17 +23,17 @@ shine sys init --dry-run
 ## 交互选择或应用 Profile
 
 ```bash
-shine sys init
-shine sys init --preset recommended
-shine sys init --preset minimal
-shine sys init --proxy --dry-run
+shine sys bootstrap
+shine sys bootstrap --preset recommended
+shine sys bootstrap --preset minimal
+shine sys bootstrap --proxy --dry-run
 ```
 
-- 在交互式终端中，`shine sys init` 会打开多选界面。
+- 在交互式终端中，`shine sys bootstrap` 会打开多选界面。
 - 指定 `--preset` 时直接应用命名 profile。
 - 非交互环境没有指定 profile 时使用预设的默认 profile。
 
-Ubuntu 还提供 `minimal` profile，适合生产服务器：仅安装 Neovim、fzf、bat、eza 和 zoxide，不包含 shell 历史同步、提示符、Node.js 工具链或 Homebrew。运行前仍应先执行 `shine sys init --preset minimal --dry-run` 复核当前版本的实际步骤。
+Ubuntu 还提供 `minimal` profile，适合生产服务器：仅安装 Neovim、fzf、bat、eza 和 zoxide，不包含 shell 历史同步、提示符、Node.js 工具链或 Homebrew。运行前仍应先执行 `shine sys bootstrap --preset minimal --dry-run` 复核当前版本的实际步骤。
 
 下载需要经过 HTTP 代理时，添加 `--proxy`。Shine 会根据 `[env]` 中的 `PROXY_HOST`、`HTTP_PROXY_PORT` 和 `PROXY_NO_PROXY` 为初始化脚本设置大小写两套代理变量；默认地址为 `http://127.0.0.1:6152`。先配合 `--dry-run` 检查实际注入值。
 
@@ -59,13 +59,13 @@ shine sys update neovim --verbose
 shine sys update --proxy
 ```
 
-该命令只检查 `shine sys init` 已记录的引导软件，不安装或升级软件，也不修改 sys manifest
+该命令只检查 `shine sys bootstrap` 已记录的引导软件，不安装或升级软件，也不修改 sys manifest
 或 shell profile。默认只显示包管理器确认有更新的项目和可复制的上游升级命令；
 `--verbose` 还会显示已是最新版和只能手动检查的项目。
 
 当前内置预设可通过 Homebrew、apt 和 winget 检查更新。直接安装器和用户自行维护的 Git
 配置会标记为需要手动检查，不会根据不可靠的信息猜测版本。`--proxy` 使用与
-`sys init --proxy` 相同的代理配置；Windows 上会显式传递 winget 的 `--proxy` 参数。
+`sys bootstrap --proxy` 使用相同的代理配置；Windows 上会显式传递 winget 的 `--proxy` 参数。
 
 `shine update` 和 `shine upgrade` 仍只处理 Shine 管理的配置和受管系统资源，不会升级这些
 第三方软件。是否执行 `shine sys update` 输出的升级命令始终由用户决定。
@@ -88,7 +88,7 @@ shine sys uninstall split-dns
 
 在 Ubuntu 上，`split-dns` 依赖应用查询 `systemd-resolved` 的 `127.0.0.53` stub。Shine 会在检测到 stub 被关闭时给出警告或拒绝写入无效配置；先重新启用 `DNSStubListener`，或确认本机解析链路确实会经过 `systemd-resolved`，再应用该项目。
 
-系统 profile 会尽量合并并保留用户内容。只有明确希望备份并替换冲突 profile 时，才使用 `shine sys init --force-profile`。
+系统 profile 会尽量合并并保留用户内容。只有明确希望备份并替换冲突 profile 时，才使用 `shine sys bootstrap --force-profile`。
 
 ## 平台说明
 

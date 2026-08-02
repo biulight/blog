@@ -5,7 +5,7 @@ sidebar_position: 6
 
 # 任务与本地服务
 
-本页说明 Shine 0.38.0 新增的两个辅助能力：保存个人快捷命令，以及把 app 预设生成的资源通过本机 HTTP 地址提供给其它应用读取。
+本页说明如何保存个人快捷命令，以及把 app 预设生成的资源通过本机 HTTP 地址提供给其它应用读取。
 
 ## 保存常用命令
 
@@ -14,6 +14,7 @@ sidebar_position: 6
 ```bash
 shine task save logs -- tail -f /var/log/example.log
 shine task save kill-port -- sh -c 'lsof -ti :3000 | xargs kill'
+shine task save project-check --cwd ~/src/example -- bun run check
 ```
 
 之后可以从任意目录运行：
@@ -25,7 +26,7 @@ shine task list
 shine task info kill-port
 ```
 
-任务保存在当前 Shine 运行时目录的 `tasks.toml` 中；设置 `SHINE_CONFIG_DIR` 或全局 `--config-dir` 时，会使用对应目录下的任务列表。
+任务保存在当前 Shine 运行时目录的 `tasks.toml` 中；设置 `SHINE_CONFIG_DIR` 或全局 `--config-dir` 时，会使用对应目录下的任务列表。通过 `--cwd` 保存的任务始终从该目录运行；未设置时继续使用调用者的当前目录。
 
 Shine 按参数数组保存并直接执行命令，不会自动经过 shell。因此普通参数边界会被保留，退出码也会原样传递给调用方。需要管道、重定向、变量展开或通配符时，把 shell 写进任务本身，例如 `sh -c '...'`。Windows 上没有系统自带的 `sh`，这类写法只适合 Unix 环境。
 
@@ -43,10 +44,10 @@ shine task delete logs
 部分 app 预设可以声明构建脚本，用来根据当前配置生成额外文件：
 
 ```bash
-shine app build surge
+shine app artifact apply surge
 ```
 
-`app build` 是显式操作；`shine app install`、`shine update` 和 `shine upgrade` 不会自动运行构建脚本。脚本失败时命令会失败，脚本输出会直接显示在终端。
+`app artifact apply` 是显式操作；`shine app install`、`shine update` 和 `shine upgrade` 不会自动运行 artifact 脚本。脚本失败时命令会失败，脚本输出会直接显示在终端。
 
 构建脚本会收到当前 `[env]` 表中的值，以及一组由 Shine 设置的路径变量：
 

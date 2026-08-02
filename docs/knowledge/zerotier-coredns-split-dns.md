@@ -287,8 +287,8 @@ PRIVATE_DNS_SERVERS = { value = "<DNS_ZEROTIER_IP>", description = "ZeroTier 网
 
 ```bash
 git clone <PRIVATE_OVERLAY_REPOSITORY> <LOCAL_OVERLAY_PATH>
-shine overlay link <LOCAL_OVERLAY_PATH>
-shine overlay show
+shine preset overlay link <LOCAL_OVERLAY_PATH>
+shine preset overlay info
 shine env get PRIVATE_DNS_DOMAIN
 shine sys info split-dns
 shine sys apply split-dns --dry-run
@@ -299,13 +299,13 @@ shine sys status
 以后在一台设备修改并推送 `shine.env.toml`，其他设备执行以下命令即可同步并重新应用：
 
 ```bash
-shine pull
+shine preset pull
 shine sys apply split-dns --dry-run
 shine sys apply split-dns
 ```
 
-Shine 会在每次新命令启动时重新读取 overlay 的 `shine.env.toml`，因此 `shine pull` 后不需要
-再执行 `shine env set`。如果 overlay 仓库还有其他预设，`shine pull` 会一起进行安全的
+Shine 会在每次新命令启动时重新读取 overlay 的 `shine.env.toml`，因此 `shine preset pull` 后不需要
+再执行 `shine env set`。如果 overlay 仓库还有其他预设，`shine preset pull` 会一起进行安全的
 fast-forward 更新；仓库存在本地改动时会拒绝拉取，避免覆盖未提交内容。
 
 ### 只配置当前设备
