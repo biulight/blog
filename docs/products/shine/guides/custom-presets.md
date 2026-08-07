@@ -49,6 +49,24 @@ shine preset export
 
 配置外部目录后，`install`、`list` 和 `update` 都从该目录读取。命令输出会显示当前激活的预设来源。
 
+### 选择外部 Shell 的部署方式
+
+外部 Shell 预设默认采用 **snapshot** 模式：安装时，Shine 会把有效类别复制到
+`~/.shine/installed/shell/`，之后运行受管副本。编辑来源后先运行 `shine update` 检查，再运行
+`shine upgrade` 应用；这让 Shell 脚本与 app 配置一样可以先审阅、再更新。旧版的直接链接安装会在
+`update` 中报告，并在 `upgrade` 时迁移。
+
+编写预设、希望反复测试源文件内容时，可在关联来源时显式启用 **live** 模式：
+
+```bash
+shine preset link ~/dotfiles/shine-presets --live
+```
+
+live 模式下，普通 Shell/Bun 源文件内容在下一次调用时直接生效。声明了 `transforms` 的文件会在每次
+调用前原子渲染；渲染失败时该次调用会中止，不会继续运行旧输出。变更 `target`、`runtime`、
+`transforms` 或 `env` 等入口元数据时，仍必须执行 `shine upgrade` 重建受管入口。要恢复默认行为，
+重新执行不带 `--live` 的 `shine preset link <PATH>`，或执行 `shine preset unlink`。
+
 也可以直接设置环境变量：
 
 ```bash

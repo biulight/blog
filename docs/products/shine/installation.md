@@ -23,7 +23,7 @@ shine --version
 
 ```bash
 SHINE_INSTALL_DIR=/custom/bin sh install.sh
-SHINE_VERSION=1.0.0 sh install.sh
+SHINE_VERSION=1.1.2 sh install.sh
 ```
 
 ## Windows PowerShell
@@ -36,16 +36,19 @@ irm https://github.com/biulight/shine/releases/latest/download/install.ps1 | iex
 
 ```powershell
 $env:SHINE_INSTALL_DIR = "$env:USERPROFILE\bin"; .\install.ps1
-$env:SHINE_VERSION = "1.0.0"; .\install.ps1
+$env:SHINE_VERSION = "1.1.2"; .\install.ps1
 ```
 
 ## 从源码安装
 
-已经安装 Rust stable toolchain 时，可以在 Shine 源码仓库中运行：
+已安装 Rust **1.88 或更高版本**时，可从 crates.io 安装：
 
 ```bash
-cargo install --path cli
+cargo install shine-cli
 ```
+
+若在 Shine 源码仓库中构建，运行 `cargo build --release`；二进制文件位于
+`target/release/shine`。
 
 ## 升级 Shine
 

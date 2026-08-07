@@ -11,6 +11,8 @@ Shine 将全局运行时状态保存在 `~/.shine/`。首次需要配置时会�
 
 ```toml
 presets_dir = "~/dotfiles/shine-presets"
+# 外部 Shell 预设默认使用 snapshot；预设开发时才设为 live
+external_shell_mode = "live"
 presets_overlay_git = "https://example.com/team/shine-overlay.git"
 presets_overlay_git_branch = "main"
 app_default_dest_root = "~/.config"
@@ -33,6 +35,7 @@ MY_API_TOKEN = { value = "<令牌>", description = "内部 API 的访问令牌" 
 | 字段 | 作用 |
 | --- | --- |
 | `presets_dir` | 使用完整的外部预设目录替代内置预设 |
+| `external_shell_mode` | 外部 Shell 预设的部署方式；默认 `snapshot`，可显式设为 `live` |
 | `presets_overlay_git` | 由 Shine 浅克隆并镜像到 `~/.shine/overlay/` 的 Git overlay URL |
 | `presets_overlay_git_branch` | Git overlay 跟踪的分支；省略时使用远端默认分支 |
 | `app_default_dest_root` | 未声明目标路径的旧式 app 预设默认根目录 |
@@ -84,6 +87,12 @@ Shine 0.40.0 也不再自动迁移旧的全局 `~/.shine/env.toml`。升级前�
 4. 默认 `~/.shine/presets/`
 
 `SHINE_CONFIG_DIR` 会改变全局配置和运行时状态目录；未另行指定预设来源时，预设目录为 `$SHINE_CONFIG_DIR/presets/`。
+
+使用外部 `presets_dir` 时，Shell 类别默认以 `snapshot` 模式复制到
+`~/.shine/installed/shell/` 后再运行。修改来源文件后，先用 `shine update` 检查，再用
+`shine upgrade` 应用，便于审阅变化且与 app 配置的更新流程一致。仅在编写和调试预设时，才把
+`external_shell_mode` 设为 `live`：源文件内容会在下次调用时生效；但 `target`、`runtime`、
+`transforms` 和 `env` 等部署元数据变更仍须运行 `shine upgrade` 重新生成受管入口。
 
 Overlay 在选定的基础预设来源上按相同相对路径覆盖文件，不替代整棵目录。手动关联的
 `presets_overlay_dir` 与 `presets_overlay_git` 互斥；使用 `shine preset overlay link` 可避免同时配置。
@@ -166,9 +175,11 @@ recipient 时，还会维护按 mode 区分的加密缓存。
 ├── config.toml
 ├── shine.env.toml
 ├── app-manifest.toml
+├── shell-manifest.toml
 ├── tasks.toml
 ├── bin/
 ├── http/
+├── installed/
 ├── overlay/
 ├── rendered/
 └── presets/

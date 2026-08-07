@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # 命令参考
 
-本页已审阅至 Shine 1.0.0 的发布提交 `c2852a0e`。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
+本页已审阅至 Shine 1.1.2 的发布提交 `51d459a`。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
 
 ## 1.0 target 规则
 
@@ -100,7 +100,7 @@ shine sys uninstall <ITEM> [--dry-run]
 shine preset new <app|shell> [--force]
 shine preset export [DIR] [--force]
 shine preset copy <app|shell|sys>/<NAME> [--force]
-shine preset link <PATH> [--create]
+shine preset link <PATH> [--create] [--live]
 shine preset unlink
 shine preset overlay link [<PATH> | --git <URL> [--branch <BRANCH>]] [--create]
 shine preset overlay info
@@ -108,7 +108,7 @@ shine preset overlay unlink
 shine preset pull
 ```
 
-`preset copy` 只把一个完整的内置预设复制到当前目录，适合创建局部 overlay；`preset export` 导出整套内置预设。Git 管理来源的安全限制见[自定义预设](../guides/custom-presets.md)。
+`preset copy` 只把一个完整的内置预设复制到当前目录，适合创建局部 overlay；`preset export` 导出整套内置预设。外部 Shell 预设默认以快照方式运行，来源内容变更需通过 `shine upgrade` 应用；`--live` 只适合预设开发，令源内容在下一次调用时生效。Git 管理来源的安全限制见[自定义预设](../guides/custom-presets.md)。
 
 ## 环境变量与密钥
 
@@ -167,4 +167,4 @@ shine self install [--dest <PATH>]
 shine self upgrade [--channel <stable|preview>]
 ```
 
-`shine --version` 在稳定版显示 `shine 1.0.0 (<commit> <date>)`；preview 构建使用 `1.0.0-preview` 形式的版本标签。
+`shine --version` 在稳定版显示 `shine 1.1.2 (<commit> <date>)`；preview 构建使用 `1.1.2-preview` 形式的版本标签。

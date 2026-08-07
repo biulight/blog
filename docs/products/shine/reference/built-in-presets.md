@@ -16,7 +16,7 @@ shine sys list --all
 shine sys info split-dns
 ```
 
-本文依据 Shine 1.0.0 源码中的内置 `presets/` 目录编写。使用其它版本时请以 `shine list --available` 和 `--help` 的输出为准。
+本文依据 Shine 1.1.2 源码中的内置 `presets/` 目录编写。使用其它版本时请以 `shine list --available` 和 `--help` 的输出为准。
 
 ## Shell 预设
 
