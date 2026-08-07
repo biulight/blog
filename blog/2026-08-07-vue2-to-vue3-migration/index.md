@@ -110,7 +110,7 @@ vue-i18n 8 和 Rsbuild 的组合。目标是 Vue 3.5、Vue Router 4、Vuex 4、E
 最后都不适合这个项目：
 
 - 331 个组件的全量重写会把业务回归风险推到最高；
-- Element UI 与 VXE Table 3 无法跟 Vue 3/compat 长期共存，最大的 UI 依赖仍要整体换代；
+- 在本项目中，Element UI 2 与 VXE Table 3 不具备可作为发布形态的 Vue 3/compat 支持，两项核心 UI/表格依赖仍须整体迁至对应的 Vue 3 版本；
 - 管理后台共享登录态、布局、权限与路由，专门建设微前端的成本远高于收益。
 
 于是选择“阶段化的一次性迁移”。`@vue/compat` 只在中间阶段以 MODE 2 运行，用运行时警告当作
