@@ -30,6 +30,12 @@ SOCKS5_PROXY_PORT = "6153"
 PROXY_HOST = "127.0.0.1"
 PROXY_NO_PROXY = "localhost,127.0.0.1,::1"
 MY_API_TOKEN = { value = "<令牌>", description = "内部 API 的访问令牌" }
+
+[[env_proxy]]
+command = "gh"
+with = ["GH_TOKEN"]
+# 省略时为 true；设为 false 时 shim 不解密也不注入值
+enabled = false
 ```
 
 | 字段 | 作用 |
@@ -46,6 +52,7 @@ MY_API_TOKEN = { value = "<令牌>", description = "内部 API 的访问令牌" 
 | `age_recipients` | `age` 后端默认加密接收者列表 |
 | `age_identity` | 解密 `age:` 密文时使用的身份文件路径，省略时可使用 `~/.shine/age/identity.txt` |
 | `[env]` | 模板变量及 shell helper 使用的值 |
+| `[[env_proxy]]` | 一个透明命令代理规则；`command` 为裸命令名，`with` 为允许注入的 `KEY` 或 `KEY=ALIAS` 列表，`enabled` 默认为 `true` |
 
 ## Env 条目格式与说明
 
@@ -71,6 +78,8 @@ DETAILED_VALUE = { value = "example", description = "供构建任务使用的示
 ## 项目配置
 
 Shine 从当前目录向上查找最近的 `shine.config.toml`。项目配置是全局配置之上的稀疏覆盖层；没有声明的字段继续继承全局值，相对路径以声明它的配置文件所在目录为基准。
+
+`[[env_proxy]]` 也遵循项目覆盖规则：项目内同名 `command` 的规则会取代全局规则，其它全局代理规则继续生效。优先用 `shine env proxy install`、`enable` 和 `disable` 管理这些条目，避免手改后忘记对应的 `~/.shine/bin/` shim。
 
 Shine 0.40.0 不再识别项目中的旧式 `config.toml` 和 `.env.toml`。升级前请分别改名为
 `shine.config.toml` 和 `shine.env.toml`；普通同名文件会被忽略，不会作为 Shine 配置读取。
@@ -176,6 +185,7 @@ recipient 时，还会维护按 mode 区分的加密缓存。
 ├── shine.env.toml
 ├── app-manifest.toml
 ├── shell-manifest.toml
+├── proxy-manifest.toml
 ├── tasks.toml
 ├── bin/
 ├── http/

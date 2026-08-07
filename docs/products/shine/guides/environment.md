@@ -148,6 +148,42 @@ shine env run --no-workspace --with MY_TOKEN -- bun run build
 `--with`；它不能与 `--workspace` 或 `--mode` 同时使用。这个模式也用于需要固定读取
 Shine 配置环境、但不应受当前工作目录影响的受管 Bun 命令入口。
 
+## 为固定凭据变量安装透明代理
+
+有些 CLI（例如 GitHub CLI）不会接受从命令行传入的 token，而是固定读取 `GH_TOKEN` 这类环境变量。若不希望把值导出到当前 shell，可为该命令安装一个透明代理：
+
+```bash
+shine env proxy install gh --with GH_TOKEN
+gh pr list
+```
+
+Shine 会在 `~/.shine/bin/` 创建同名 shim，并记录当前 `PATH` 中找到的真实命令。运行 `gh` 时，shim 只在它的子进程中解析 `GH_TOKEN_SECRET`；若不存在密文，才读取明文 `GH_TOKEN`。该值不会写回或导出到父 shell。`--with` 可重复使用，也可写成 `KEY=ALIAS`，以不同的变量名传给目标命令。
+
+只代理你明确允许的裸命令名；命令名只能包含 ASCII 字母、数字、`-`、`_` 或 `.`。安装前请确认 `~/.shine/bin/` 已在 `PATH` 的靠前位置，且目标命令不是另一个 Shine 代理。若同名入口已存在但并非 Shine 创建，安装会拒绝覆盖它。
+
+默认规则保存在全局 `~/.shine/config.toml`。在含有 `shine.config.toml` 的项目内加入 `--project`，可将该命令的规则限定到项目；同一命令的项目规则会覆盖全局规则：
+
+```bash
+shine env proxy install gh --with GH_TOKEN --project
+shine env proxy list
+```
+
+需要临时保留 shim、但禁止任何解密或注入时，可禁用规则。禁用后命令会直接转发给真实程序：
+
+```bash
+shine env proxy disable gh
+shine env proxy enable gh
+shine env proxy disable gh --project
+```
+
+不再需要代理时，移除 Shine 管理的 shim 及其用户级规则：
+
+```bash
+shine env proxy uninstall gh
+```
+
+如果真实命令被升级、移动或删除，重新执行 `shine env proxy install gh --with GH_TOKEN` 以记录新的目标路径。
+
 ## 使用分层项目环境
 
 在项目根目录创建 `shine.workspace.toml`，声明可用 mode、按顺序合并的文件和 GPG recipient：

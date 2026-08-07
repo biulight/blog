@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # 命令参考
 
-本页已审阅至 Shine 1.1.2 的发布提交 `51d459a`。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
+本页已审阅至 Shine 1.2.0 的发布提交 `83d0498`。任何子命令都可以使用 `--help` 查看当前安装版本的准确参数。
 
 ## 1.0 target 规则
 
@@ -118,6 +118,11 @@ shine env set <KEY> <VALUE> [--force]
 shine env get <KEY>
 shine env delete <KEY> [--force]
 shine env run [--workspace <FILE>] [--mode <MODE>] [--no-workspace] [--with <KEY[=ALIAS]>]... -- <COMMAND>...
+shine env proxy install <COMMAND> --with <KEY[=ALIAS]>... [--project]
+shine env proxy list
+shine env proxy uninstall <COMMAND>
+shine env proxy enable <COMMAND> [--project]
+shine env proxy disable <COMMAND> [--project]
 shine env secret encrypt [--backend <gpg|age>] [-r <RECIPIENT>]... [--from <KEY>] [--set <KEY>] [--force]
 shine env secret decrypt <KEY>
 shine env secret export <KEY> [--as <ALIAS>]
@@ -127,6 +132,8 @@ shine env secret identity list
 ```
 
 `--with` 可重复使用，写成 `KEY=ALIAS` 可改变子进程看到的变量名。`--no-workspace` 只使用显式值和已有进程环境，不能与 `--workspace` 或 `--mode` 同时使用。Touch ID identity 只适用于 macOS，并依赖 `age-plugin-se`。
+
+`env proxy install` 在 `~/.shine/bin/` 创建同名 PATH shim，按规则仅向目标子进程注入 `--with` 指定的值；每个值优先读取 `<KEY>_SECRET`，否则读取 `<KEY>`。`disable` 保留 shim 但跳过解密和注入；项目规则需在当前目录或其祖先存在 `shine.config.toml`，并覆盖同名全局规则。`uninstall` 移除 Shine 管理的 shim 和用户级规则。
 
 ## 任务、本地服务与主题
 
@@ -167,4 +174,4 @@ shine self install [--dest <PATH>]
 shine self upgrade [--channel <stable|preview>]
 ```
 
-`shine --version` 在稳定版显示 `shine 1.1.2 (<commit> <date>)`；preview 构建使用 `1.1.2-preview` 形式的版本标签。
+`shine --version` 在稳定版显示 `shine 1.2.0 (<commit> <date>)`；preview 构建使用 `1.2.0-preview` 形式的版本标签。
