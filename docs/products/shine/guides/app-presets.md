@@ -75,6 +75,17 @@ shine app refresh <CATEGORY> <SOURCE_FILE>
 
 内置 `surge` 预设可把 HTTPS Base64 URI 订阅转换为受管的 `subscription-proxies.conf`。此功能需要 Bun，支持兼容的 `ss://` 和 `vmess://` 记录；VLESS、不支持的 transport、插件、坏记录与重复项会被跳过，并只输出不含凭据的摘要。用户维护的 `local-proxies.conf` 不会被改写。
 
+要定制 Surge 的本地代理、策略组或规则文件，先将完整内置预设复制到自己的局部 overlay：
+
+```bash
+mkdir -p ~/dotfiles/shine-overlay
+cd ~/dotfiles/shine-overlay
+shine preset copy app/surge
+shine preset overlay link .
+```
+
+编辑复制出的 `app/surge/local-proxies.conf`、`local-proxy-groups.conf` 或 `local-rules.conf`，再安装预设。只打算定制其中部分文件时，可以删除其余复制出的文件：overlay 按相对路径覆盖，缺失的文件会继续使用内置版本并随 Shine 更新。不要直接修改 Surge Profiles 目录中的受管副本。
+
 先配置 URL 并安装：
 
 ```bash
@@ -114,7 +125,18 @@ shine app artifact remove surge
 
 ### Clash Verge Rev
 
-内置 `clash-verge` 预设提供一个默认无效果的 `merge.yaml` 示例。要叠加自己的代理、策略组、rule-provider 和前置规则，请在 overlay 的同路径 `app/clash-verge/merge.yaml` 中维护实际内容，然后先安装预设：
+内置 `clash-verge` 预设提供一个默认无效果的 `merge.yaml` 示例。要叠加自己的代理、策略组、rule-provider 和前置规则，先将完整内置预设复制到自己的局部 overlay：
+
+```bash
+mkdir -p ~/dotfiles/shine-overlay
+cd ~/dotfiles/shine-overlay
+shine preset copy app/clash-verge
+shine preset overlay link .
+```
+
+这会创建 `app/clash-verge/`，其中包含当前 Shine 版本附带的 `merge.yaml`、元数据和构建脚本。编辑其中的 `app/clash-verge/merge.yaml`，填入实际配置；不要直接修改 `~/.shine/clash-verge/`，该目录是 Shine 安装后的受管副本。只打算定制 `merge.yaml` 时，可以删除复制出的其它文件：overlay 按相对路径覆盖，缺失的文件会继续使用内置版本并随 Shine 更新。
+
+确认内容后安装预设：
 
 ```bash
 shine app install clash-verge
