@@ -111,13 +111,18 @@ shine env secret identity list
 
 `--touch-id` 只适用于 macOS；解密时会触发系统 Touch ID 提示。普通身份使用 `age-keygen`，默认写入 `~/.shine/age/identity.txt`。
 
-把默认后端和团队 recipient 写入 `~/.shine/config.toml`：
+如需在本机所有项目中使用同一默认后端和 recipient，将它们写入 `~/.shine/config.toml`：
 
 ```toml
 secret_backend = "age"
 age_recipients = ["age1se1qexample...", "age1qteammate..."]
 age_identity = "~/.shine/age/identity.txt"
 ```
+
+如果 recipient 是某个项目团队共享的名单，应将它写入项目根目录的
+`shine.workspace.toml` 的 `[env.encryption]`；这样可以随项目提交，而不会影响本机的其他
+项目。该配置会优先于全局默认值，完整格式见下文“使用分层项目环境”。不要将私有
+`age_identity` 提交到仓库。
 
 也可以只在单次命令中选择后端和 recipient：
 
@@ -186,7 +191,8 @@ shine env proxy uninstall gh
 
 ## 使用分层项目环境
 
-在项目根目录创建 `shine.workspace.toml`，声明可用 mode、按顺序合并的文件和 GPG recipient：
+在项目根目录创建 `shine.workspace.toml`，声明可用 mode、按顺序合并的文件和项目共享的
+GPG recipient：
 
 ```toml
 version = 1
@@ -203,7 +209,7 @@ files = [
 
 [env.encryption]
 recipient = "user@example.com"
-# 也可使用 age
+# 团队使用 age 时，取消以下两行注释，并填入每位成员的 recipient
 # backend = "age"
 # age_recipients = ["age1se1qexample...", "age1qteammate..."]
 ```

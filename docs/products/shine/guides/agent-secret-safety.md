@@ -33,7 +33,7 @@ shine env run --mode development -- bun run build
 
 ## age identity 是解密能力
 
-使用 `age` 后端时，`age_recipients = ["age1..."]` 表示密文要加密给谁。recipient 类似公钥地址，可以写入团队配置或提交到仓库。
+使用 `age` 后端时，`age_recipients = ["age1..."]` 表示密文要加密给谁。recipient 类似公钥地址：个人默认值可写入 `~/.shine/config.toml`，项目团队共享的名单应写入 `shine.workspace.toml` 的 `[env.encryption]`，后者可以提交到仓库。
 
 ```toml
 secret_backend = "age"

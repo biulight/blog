@@ -128,7 +128,7 @@ PROXY_HOST = { value = "127.0.0.1", description = "本地代理主机" }
 
 ## Workspace 环境
 
-`shine.workspace.toml` 定义项目可用 mode、环境源文件和加密 recipient：
+`shine.workspace.toml` 定义项目可用 mode、环境源文件和项目共享的加密 recipient：
 
 ```toml
 version = 1
@@ -152,6 +152,11 @@ recipient = "user@example.com"
 ```
 
 环境源按 `files` 顺序合并。默认保留当前进程已经存在的变量；设置 `env.override_process_env = true` 后，改由 workspace 值覆盖。
+
+执行 `shine env secret seal` 或 `shine env run` 时，加密设置的优先级为命令行参数、
+`[env.encryption]`、全局 `~/.shine/config.toml`。因此，全局配置适合个人默认值；项目团队的
+recipient 应放在此文件中。recipient 是公钥信息，可提交到仓库；不要提交 `age_identity` 等
+私有身份文件。
 
 每个环境源文件使用以下结构：
 
