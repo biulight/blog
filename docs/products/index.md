@@ -15,7 +15,7 @@ sidebar_position: 1
 
 ## 已发布
 
-- [Shine](/products/shine)：管理 shell 脚本、应用配置和系统初始化预设的跨平台命令行工具。
+- [Shine](/products/shine)：跨平台预设管理工具；完整中英文手册由 Shine 仓库独立发布。
 
 <!--
 暂未上线的产品手册入口，发布前不要出现在页面正文。

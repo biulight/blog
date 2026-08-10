@@ -5,14 +5,16 @@ projects:
     status: active
     local_path: ../shine
     repository: https://github.com/biulight/shine
-    manual_root: docs/products/shine
+    portal_root: docs/products/shine
+    public_manual_root: ../shine/docs/manual
+    public_translation_root: ../shine/website/i18n/zh-Hans/docusaurus-plugin-content-docs/current
     fact_sources:
       - docs/README.zh-CN.md
       - CHANGELOG.md
       - cli/src/commands
       - Cargo.toml
-    last_reviewed_ref: 83d0498a50b65322d2ca9d204a427eb67d6b1905
-    last_reviewed_version: 1.2.0
+    last_migrated_ref: e228922a5f263eabda92dba3cf102560c61d8a9e
+    last_migrated_version: 1.2.0
 
   - id: deskmesh
     name: Deskmesh

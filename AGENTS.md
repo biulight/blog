@@ -6,22 +6,24 @@ formats.
 
 ## Start here
 
-1. Read `.agents/projects.yml` to find the product repository and the last reviewed revision.
+1. Read `.agents/projects.yml` to find the product repository, public manual, and local portal.
 2. Read the target project's own `AGENTS.md` before inspecting its implementation.
-3. Compare the product repository with `last_reviewed_ref`; do not copy its README mechanically.
+3. Treat a migrated product repository's bilingual manual as authoritative; do not recreate it here
+   from its README or maintain a second copy.
 4. Classify each user-visible change as installation, task guide, reference, troubleshooting, or
    reusable knowledge.
-5. Update the smallest complete set of pages and then update `last_reviewed_ref` and
-   `last_reviewed_version`.
+5. Keep product portals and legacy redirect pages valid when a migrated manual changes routes.
 
 ## Source-of-truth boundaries
 
 - Product repositories are authoritative for behavior, commands, configuration, compatibility, and releases.
-- This repository is authoritative for the structure and wording of public user manuals.
+- Product repositories are authoritative for migrated public user manuals. This repository is
+  authoritative for Biulight product portals, public knowledge, and blog content.
 - Internal architecture, ADRs, CI runbooks, and developer-only conventions stay in the product
   repository unless they directly help a user complete a task.
-- `docs/knowledge/` contains reusable, project-independent guidance. Product-specific instructions
-  belong under `docs/products/<product>/`.
+- `docs/knowledge/` contains reusable, project-independent guidance. For a migrated product,
+  `docs/products/<product>/` contains only its portal and compatibility redirects; full
+  product-specific instructions belong in the product repository.
 - Never invent behavior from an issue, plan, or TODO. Verify it in released code, command definitions,
   tests, or release artifacts.
 
@@ -43,9 +45,8 @@ formats.
 - Run `pnpm typecheck` when React, TypeScript, navigation, or theme code changes.
 - Review `git diff --check` and `git status --short`. Preserve unrelated user changes.
 
-## Documentation update record
+## Product portal update record
 
-When a product manual is reviewed, update its entry in `.agents/projects.yml`. A review reference means
-that all user-visible changes through that commit were considered; it does not mean every internal
-change was copied into the manual.
-
+When a manual is migrated, update `last_migrated_ref` and `last_migrated_version`. Ongoing behavior
+and translation reviews happen in the product repository; this repository tracks portal and
+legacy-route compatibility after migration.
