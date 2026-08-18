@@ -150,7 +150,7 @@ YubiKey、ZeroTier、Split-DNS、代理原理等文章可能以 Shine 为实践�
 | 公共博客文章 | `blog` | `blog/` | 是 |
 | 内部通用指南 | `blog-private` | `docs/internal/` | 否 |
 | ShineOverlay 与环境扩展 | `blog-private` | `docs/products/shine/internal/` | 否 |
-| 内部实践文章 | `blog-private` | `blog/internal/` | 否 |
+| 内部公告、复盘、周报等时间流文章 | `blog-private` | `blog/internal/` | 否 |
 | 公共内容在内部站中的副本 | 其原公开仓库 | `blog-private` 中的生成目录 | 仅内部站展示，不可编辑 |
 
 ### 7.2 分类决策
@@ -257,7 +257,7 @@ blog-private/
 │   └── internal/                # 本仓权威内部通用指南
 ├── blog/
 │   ├── ...                      # 从 blog 生成的公共文章
-│   └── internal/                # 本仓权威内部文章
+│   └── internal/                # 本仓权威内部时间流文章
 └── .generated/
     ├── shine-manual-ref
     └── public-blog-ref
@@ -265,6 +265,14 @@ blog-private/
 
 同步脚本必须先保护本仓内部目录，再更新生成内容。不得让 `rsync --delete` 的目标范围覆盖内部
 权威目录。
+
+内部站必须保持权威来源和发布边界严格分开，但阅读界面按任务融合。公共文章与本仓权威内部文章在
+private 的 `/blog` 中按时间统一展示，并由主题层根据源路径标记“公开镜像”或“内部专属”；
+`/internal/blog` 保留为内部文章筛选入口。内部文章仍只能存在于 `blog-private/blog/internal/`，不得
+进入公共仓库、公共构建输入或任何 feed。
+
+同一原则适用于文档导航：Shine 公开手册可与 Shine 内部扩展共用产品侧栏，公共知识可与内部实践
+共用“知识与实践”侧栏。融合只发生在受访问控制的 private 阅读层，不改变内容权威来源或同步方向。
 
 ## 9. 公开站发布要求
 
@@ -356,7 +364,8 @@ Shine README 保留：
 现有 `blog-private/scripts/sync-public-content.sh` 从单一 `blog` 来源同步。迁移后必须支持：
 
 1. 从 `shine` 的英文和简体中文公开手册内容根同步产品手册；
-2. 从 `blog` 同步公共知识、公共博客和所需静态资源；
+2. 从 `blog` 同步公共知识、公共博客和所需静态资源；private 可在展示层与受保护的
+   `blog/internal/**` 合并，但不得把内部文件写回公共来源；
 3. 不从 `blog` 同步旧的 Shine 兼容页覆盖产品手册；
 4. 不删除或覆盖 `blog-private` 的内部权威目录；
 5. 分别记录两个源仓库的 commit SHA；
