@@ -315,15 +315,59 @@ sudo grep '^server' /etc/letsencrypt/renewal/<SERVICE_DOMAIN>.conf
 
 ### Windows
 
-以需要使用该证书的用户身份运行：
+若选择推荐的 bootstrap 方式，先安装 `step` 客户端 CLI。使用 Winget：
+
+```powershell
+winget install Smallstep.step
+```
+
+也可使用 Scoop：
+
+```powershell
+scoop bucket add smallstep https://github.com/smallstep/scoop-bucket.git
+scoop install smallstep/step
+```
+
+安装后重新打开终端并确认命令可用：
+
+```powershell
+step version
+```
+
+Windows 客户端只需安装 `step`，不需要安装运行 CA 服务的 `step-ca`。随后以需要使用该证书的
+用户身份运行：
 
 ```powershell
 step ca bootstrap --ca-url https://<CA_DOMAIN>:9443 --fingerprint <ROOT_FINGERPRINT> --install
 ```
 
-bootstrap fingerprint 用于验证首次下载的根证书，不等同于 Windows 根证书 thumbprint。若服务
-账户或系统服务也需访问 TLS 服务，另行核对并把**公开根证书**安装到 `LocalMachine\Root`；
-不要导入私钥。
+`step` 不是 Windows 建立信任的必要条件；这里推荐它，是因为该命令会下载根证书、使用已
+独立核对的 fingerprint 验证证书，并完成安装。当前用户运行时，根证书会进入
+`CurrentUser\Root`。
+
+若已通过可信渠道取得并核验公开根证书，也可直接使用 Windows PowerShell 导入，无需安装
+`step`：
+
+```powershell
+# 仅供当前用户及其进程使用，无需管理员权限
+Import-Certificate `
+  -FilePath .\private-network-root-ca.cer `
+  -CertStoreLocation Cert:\CurrentUser\Root
+```
+
+服务账户、SYSTEM 或其他用户上下文运行的程序通常需要计算机级信任。此时应在**管理员
+PowerShell** 中导入：
+
+```powershell
+Import-Certificate `
+  -FilePath .\private-network-root-ca.cer `
+  -CertStoreLocation Cert:\LocalMachine\Root
+```
+
+也可通过 `certlm.msc` 导入到“本地计算机 → 受信任的根证书颁发机构”，或在批量设备上通过
+组策略、MDM 分发。无论采用哪种方式，都只能导入**公开根证书**，不得导入私钥；bootstrap
+fingerprint 不等同于 Windows 证书管理器显示的 thumbprint。不要从尚未受信的 CA 连接下载后
+未经独立核验便直接导入。
 
 ### macOS
 
@@ -336,7 +380,8 @@ dig <CA_DOMAIN>
 dig <SERVICE_DOMAIN>
 ```
 
-安装 `step` 并使用独立核对过的 fingerprint 引导。代理环境中可临时绕过代理：
+通过 Homebrew 安装 `step` 客户端 CLI，再使用独立核对过的 fingerprint 引导。代理环境中可
+临时绕过代理：
 
 ```bash
 brew install step
