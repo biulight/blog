@@ -1,57 +1,42 @@
 ---
-title: Vim 与 Neovim：从 vi 到现代编辑器
-description: 了解 Vim 和 Neovim 的历史、现状、差异与未来方向。
-sidebar_position: 1
+title: Vim：从第一次编辑到编辑语言
+description: 面向开发者的 Vim 基础教程：先完成一次安全编辑，再用 Operator、Motion 和 Text Object 组织编辑操作。
+sidebar_position: 0
 ---
 
-# Vim 与 Neovim：从 vi 到现代编辑器
+# Vim：从第一次编辑到编辑语言
 
-这一节先帮你建立一个判断：Vim 和 Neovim 不是两套必须二选一的「快捷键软件」，而是一条延续数十年的编辑传统。先掌握共同的模式、动作和文本对象，再按自己的环境选择编辑器与配置，学习成本最低。
+这组教程不以背诵快捷键表为目标，而是让你先说清楚自己要做什么、要操作什么范围，再把它写成 Vim 操作。
 
-## 从 vi 开始
+```text
+Action / Operator  → 做什么
+Target             → 对什么范围
+Control            → 做几次、如何重复
+```
 
-1976 年，Bill Joy 在 Unix 上开发了 `vi`。它把输入文字与发出编辑命令分开：在 Normal 模式中，`d` 表示删除、`w` 表示移动到下一个单词；组合成 `dw` 就是“删除一个单词”。这种“操作符 + 动作”的组合方式，让常用编辑操作无需离开主键区，后来成为 Vim 系列最重要的使用习惯。
+例如，`di(` 可以读成“delete 当前圆括号内部的对象”，而不是一条孤立的快捷键。
 
-1991 年，Bram Moolenaar 发布 Vim（`Vi IMproved`）。它在兼容 `vi` 的基础上加入了多窗口、语法高亮、脚本与插件等能力，并长期被许多 Unix-like 系统作为可用的 `vi` 实现。Bram 于 2023 年去世后，Vim 仍由社区维护；Vim 9.1 发行说明也明确将该版本献给这位持续领导项目三十多年的作者。
+## 阅读顺序
 
-Vim 的生命力，来自 Bram Moolenaar 三十余年的持续投入，也来自后来无数维护者与使用者的共同传承。感谢他留下的不只是一个编辑器，更是一种让人专注于文字与思考的工作方式。
+1. [前言：Vim 与 Neovim](./背景与选择.md)：了解历史传承、Bram Moolenaar 的贡献以及 Vim / Neovim 的关系。
+2. [00 Vim 起步](./起步.md)：在安全文本中完成移动、编辑、撤销和退出。
+3. [01 Vim 的核心思想](./核心思想.md)：认识 Action、Target 与 Control。
+4. [02 Motion 与 Count](./移动与数量.md)：用合适粒度到达目标。
+5. [03 Operator 与 Motion](./操作符与移动.md)：把“做什么”和“到哪里”组合起来。
+6. [04 Text Object](./文本对象.md)：直接描述单词、引号和括号中的对象。
+7. [05 Change 与插入位置](./修改与插入.md)：完成一次可以重复的修改。
+8. [06 Yank、Delete、Register 与 Put](./复制删除与寄存器.md)：理解文本去了哪里。
+9. [07 字符定位与 Search](./定位与搜索.md)：更快抵达下一个目标。
+10. [08 重复修改](./重复修改.md)：用 `.` 重放一次有意义的编辑。
+11. [09 综合练习](./综合练习.md)：在未见过的代码中表达编辑意图。
 
-## Neovim 为什么出现
+前言是整套教程的开篇，承担背景介绍与致谢的作用；00 是第一篇动手教学章。需要配置练习环境时，
+再进入对应的接入页。
 
-Neovim 于 2014 年从 Vim 分叉。它不是重新发明编辑方式，而是在尽可能保持 Vim 编辑体验和 Vimscript 兼容性的同时，重新整理内部架构，让异步任务、外部界面和扩展开发更容易进行。
+## 适用环境
 
-因此，两者最核心的知识是通用的：模式切换、操作符、动作、文本对象、寄存器、宏、搜索与替换，在 Vim、Neovim 以及各类 Vim 模式插件中都能迁移。Neovim 官方也将自己定义为 Vim 的 fork，而不是 clone；除 Vim9script 外，它尽量保持对 Vim 编辑与 Vimscript 特性的兼容。
+教程以原生 Vim 和 Neovim 的稳定编辑语义为基线。基础 Mode、Motion、Operator 和常见 Text Object 通常也适用于 IDE 的 Vim Mode；保存、关闭、系统剪贴板，以及 Buffer / Window / Tab Page 等能力则可能由宿主应用接管。
 
-## 今天如何看待它们
+建议先在日常编辑器中开启 Vim Mode 练习。需要接入帮助时，可阅读 [VS Code](../preface/vscode.md)、[JetBrains](../preface/jetbrains.md) 或 [AstroNvim](../preface/terminal-astronvim.md) 的说明。
 
-Vim 并没有停止发展。当前 Vim 9 系列继续维护，Vim9 script、类与对象、virtual text、平滑滚动和内置 EditorConfig 支持等能力，说明它仍是一个活跃、跨平台且适合远程服务器和轻量环境的编辑器。
-
-Neovim 则更强调可扩展性与现代开发体验：
-
-- 内置 Lua 运行时与 API，适合用 `init.lua` 配置和开发插件。
-- 内置 LSP 客户端；连接语言服务器后，可获得跳转定义、重命名、诊断、补全等能力。语言服务器本身仍需要另行安装。
-- 提供 Tree-sitter 集成、异步任务、终端模拟器和 MessagePack-RPC API，便于插件、图形界面和其他程序与编辑器协作。
-
-这不代表 Neovim 天然更适合每个人。若你在服务器上希望零配置打开文件，或要遵循既有的 Vim 配置与运维习惯，Vim 往往更直接；若你愿意维护 Lua 配置，并希望把终端编辑器逐步扩展为开发环境，Neovim 通常是更顺手的起点。
-
-## 未来：共同的核心，不同的重点
-
-两者都在延续 modal editing 的核心价值，所以今天学习的 `d`、`c`、`y`、`f`、`/` 和文本对象，不会因项目演进而失效。
-
-Vim 的公开开发列表持续记录下一次补丁和后续版本的修复与改进，重心仍是稳定、兼容和广泛平台支持。Neovim 则公开维护路线图：已完成的版本持续完善 Lua、LSP、Tree-sitter 和界面 API；其 0.13 方向被命名为 “The year of Batteries Included”，包含更完善的内置包管理、远程工作流、LSP 与界面能力，并把 1.0 作为准备目标。路线图中的条目会随优先级调整，不能视作发布日期或功能承诺。
-
-对学习者而言，最可靠的策略是：先用 Vim 的共同语言建立肌肉记忆；然后在实际工作中选择 Vim、Neovim，或 VS Code、JetBrains、Obsidian 的 Vim 模式。工具可以迁移，编辑思维会留下来。
-
-## 接下来学什么
-
-继续阅读 [Vim 起步](./起步.md)，先练习进入与退出各模式、移动光标和完成最基本的编辑；熟悉 `w`、`$` 等基础动作后，再阅读 [Vim 的核心思想](./核心思想.md)，理解如何用“操作符 + 动作”组织编辑命令。若你已经决定在终端中使用 Neovim，可再阅读 [终端中使用 AstroNvim](../preface/terminal-astronvim.md)。
-
-## 参考资料
-
-- [Vim 简介](https://www.vim.org/about.php)
-- [Vim 版本历史](https://github.com/vim/vim-history)
-- [Vim 9.1 发行公告](https://www.vim.org/vim-9.1-released.php)
-- [Vim 官方仓库](https://github.com/vim/vim)
-- [Neovim 简介与从 Vim 迁移说明](https://neovim.io/doc/user/nvim/)
-- [Neovim 与 Vim 的差异](https://neovim.io/doc/user/vim_diff/)
-- [Neovim 路线图](https://neovim.io/roadmap/)
+读完前言后，从 00 起步进入实操；所有练习都应在可丢弃的文本或未保存副本中进行。按错键时，先按 `Esc` 回到 Normal Mode，再用 `u` 撤销。
