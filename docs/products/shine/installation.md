@@ -1,63 +1,8 @@
 ---
-title: 安装与升级
-sidebar_position: 2
+title: 安装与升级（已迁移）
+unlisted: true
 ---
 
-# 安装与升级
+import ExternalRedirect from '@site/src/components/ExternalRedirect';
 
-Shine 支持 macOS、Linux 和 Windows。官方安装脚本从 GitHub Releases 下载当前平台的二进制文件。
-
-## macOS 与 Linux
-
-```bash
-curl -fsSL https://github.com/biulight/shine/releases/latest/download/install.sh | sh
-```
-
-默认安装到 `~/.local/bin/shine`，安装脚本不会修改 shell 配置。确认 `~/.local/bin` 已在 `PATH` 中，然后验证：
-
-```bash
-shine --version
-```
-
-如需指定位置或版本：
-
-```bash
-SHINE_INSTALL_DIR=/custom/bin sh install.sh
-SHINE_VERSION=0.36.0 sh install.sh
-```
-
-## Windows PowerShell
-
-```powershell
-irm https://github.com/biulight/shine/releases/latest/download/install.ps1 | iex
-```
-
-默认安装到 `%LOCALAPPDATA%\Programs\shine\shine.exe`，不会修改用户 `PATH`。如需指定位置或版本：
-
-```powershell
-$env:SHINE_INSTALL_DIR = "$env:USERPROFILE\bin"; .\install.ps1
-$env:SHINE_VERSION = "0.36.0"; .\install.ps1
-```
-
-## 从源码安装
-
-已经安装 Rust stable toolchain 时，可以在 Shine 源码仓库中运行：
-
-```bash
-cargo install --path cli
-```
-
-## 升级 Shine
-
-安装后可由 Shine 下载稳定版或 preview 版：
-
-```bash
-shine self upgrade
-shine self upgrade --channel stable
-shine self upgrade --channel preview
-```
-
-`preview` 是持续滚动的预发布通道，不参与日常自动更新检查。运行 `shine update` 可以同时检查已安装配置和稳定版程序更新。
-
-下一步：[完成第一次预设安装](./quick-start.md)。
-
+<ExternalRedirect to="https://biulight.github.io/shine/zh-Hans/installation" />

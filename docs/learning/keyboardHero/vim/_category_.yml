@@ -1,2 +1,5 @@
-label: vim
+label: Vim
 position: 2
+link:
+  type: doc
+  id: learning/keyboardHero/vim/index

@@ -1,6 +1,6 @@
 {
   "name": "@biulight/blog",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "private": true,
   "packageManager": "pnpm@11.7.0",
   "scripts": {
@@ -18,7 +18,9 @@
   "dependencies": {
     "@docsearch/react": "^3.8.3",
     "@docusaurus/core": "^3.7.0",
+    "@docusaurus/plugin-content-blog": "3.9.2",
     "@docusaurus/preset-classic": "^3.7.0",
+    "@giscus/react": "^3.1.0",
     "@mdx-js/react": "^3.1.0",
     "clsx": "2.1.1",
     "prism-react-renderer": "2.4.1",
@@ -31,7 +33,7 @@
     "@docusaurus/types": "3.9.2",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.3",
-    "typescript": "5.9.2"
+    "typescript": "6.0.3"
   },
   "browserslist": {
     "production": [
@@ -46,6 +48,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=22.0.0"
   }
 }

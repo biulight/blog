@@ -2,7 +2,7 @@
 
 本仓库维护 Biulight 项目的公开用户手册、实践指南与持续沉淀的知识，并使用 [Docusaurus](https://docusaurus.io/) 构建和发布。
 
-访问线上站点：[blog.biulight.cn/timeline](https://blog.biulight.cn/timeline/)
+访问线上站点：[blog.biulight.top/timeline](https://blog.biulight.top/timeline/)
 
 ## 内容结构
 
@@ -16,8 +16,10 @@
 
 需要准备以下环境：
 
-- Node.js 18 或更高版本
-- pnpm 11
+- Node.js 22 或更高版本
+- pnpm 11 或更高版本
+
+`pnpm` 11 的最低支持 Node 版本为 22，因此本仓库统一按 Node.js 22+ 作为本地开发前提。
 
 安装依赖并启动本地开发服务器：
 

@@ -121,8 +121,8 @@ gpg_key_id = "<完整指纹>"
 
 ```bash
 shine env set YUBIKEY_TEST "not-a-real-secret"
-shine env encrypt --from YUBIKEY_TEST --set YUBIKEY_TEST_SECRET
-shine env decrypt YUBIKEY_TEST_SECRET
+shine env secret encrypt --from YUBIKEY_TEST --set YUBIKEY_TEST_SECRET
+shine env secret decrypt YUBIKEY_TEST_SECRET
 shine env delete YUBIKEY_TEST
 shine env delete YUBIKEY_TEST_SECRET
 ```
@@ -132,7 +132,7 @@ shine env delete YUBIKEY_TEST_SECRET
 对于含 `shine.workspace.toml` 的项目，可继续验证封存和子进程注入：
 
 ```bash
-shine env seal
+shine env secret seal
 shine env run --mode development -- <你的命令>
 ```
 
@@ -173,7 +173,7 @@ Windows PowerShell 使用相同命令。该操作重启 `gpg-agent` 和 `scdaemo
 ### Shine 报告找不到 recipient
 
 确认 `gpg_key_id` 使用 `gpg --list-keys --with-colons` 可找到的完整指纹；也可以用
-`shine env encrypt -r <完整指纹>` 临时覆盖配置。Shine 调用的是当前终端 PATH 中的
+`shine env secret encrypt -r <完整指纹>` 临时覆盖配置。Shine 调用的是当前终端 PATH 中的
 `gpg`，因此应先在同一个终端完成上述 GPG 测试。
 
 YubiKey OpenPGP 的 PIN、触摸策略和管理命令以

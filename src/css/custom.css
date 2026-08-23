@@ -15,6 +15,8 @@
   --ifm-color-primary-lightest: #3cad6e;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --biulight-page-title-size: clamp(1.6rem, 3vw, 2rem);
+  --biulight-page-title-line-height: 1.14;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -27,4 +29,54 @@
   --ifm-color-primary-lighter: #32d8b4;
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+.markdown > h2 {
+  --ifm-h2-font-size: 1.5rem;
+}
+
+.theme-doc-markdown,
+.theme-blog-post-page article header,
+.blog-wrapper.blog-post-page article header {
+  --ifm-h1-font-size: var(--biulight-page-title-size);
+}
+
+.theme-doc-markdown > h1:first-child,
+.theme-doc-markdown header > h1,
+.theme-blog-post-page article header h1,
+.blog-wrapper.blog-post-page article header h1,
+article header h1,
+[class*='title_'] {
+  font-size: var(--biulight-page-title-size);
+  line-height: var(--biulight-page-title-line-height);
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 997px) {
+  .built-in-presets-shell-table + table th:nth-child(2),
+  .built-in-presets-shell-table + table td:nth-child(2) {
+    min-width: 12rem;
+    width: 12rem;
+    white-space: nowrap;
+  }
+
+  .built-in-presets-app-table + table th:first-child,
+  .built-in-presets-app-table + table td:first-child {
+    min-width: 10.5rem;
+    width: 10.5rem;
+    white-space: nowrap;
+  }
+
+  .built-in-presets-system-table + table th:nth-child(2),
+  .built-in-presets-system-table + table td:nth-child(2) {
+    min-width: 10.5rem;
+    width: 10.5rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 996px) {
+  :root {
+    --biulight-page-title-size: clamp(1.9rem, 6vw, 2.4rem);
+  }
 }

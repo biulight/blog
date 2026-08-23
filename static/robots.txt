@@ -1,0 +1,6 @@
+# Algolia-Crawler-Verif: 9AB35D512F56BC26
+
+User-agent: *
+Allow: /
+
+Sitemap: https://blog.biulight.top/timeline/sitemap.xml
