@@ -1,0 +1,9 @@
+.comments {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ifm-toc-border-color);
+}
+
+.comments h2 {
+  margin-bottom: 1.5rem;
+}

@@ -1,0 +1,4 @@
+{
+  "origins": ["https://blog.biulight.top"],
+  "originsRegex": ["^http://localhost:[0-9]+$"]
+}
